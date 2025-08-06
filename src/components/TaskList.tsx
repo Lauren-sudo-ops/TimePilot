@@ -33,6 +33,21 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onUpdateTask, onDeleteTask, 
   const [showCompletedTasks, setShowCompletedTasks] = useState(false);
   const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
   const [showHelpModal, setShowHelpModal] = useState(false);
+
+  // Auto-detect deadline type based on whether deadline is set (similar to TaskInput)
+  React.useEffect(() => {
+    if (editingTaskId) {
+      if (editFormData.deadline && editFormData.deadline.trim() !== '') {
+        // User set a deadline - keep current deadlineType or default to 'hard'
+        if (editFormData.deadlineType === 'none') {
+          setEditFormData(prev => ({ ...prev, deadlineType: 'hard' }));
+        }
+      } else {
+        // No deadline set - automatically set to 'none'
+        setEditFormData(prev => ({ ...prev, deadlineType: 'none' }));
+      }
+    }
+  }, [editFormData.deadline, editingTaskId]);
   
   // Get today's date in YYYY-MM-DD format for min attribute
   const today = new Date().toISOString().split('T')[0];
