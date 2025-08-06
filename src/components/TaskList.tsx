@@ -181,6 +181,7 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onUpdateTask, onDeleteTask, 
   const cancelEdit = () => {
     setEditingTaskId(null);
     setEditFormData({});
+    setShowAdvancedOptions(false);
   };
 
   return (
