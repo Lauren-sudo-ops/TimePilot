@@ -16,7 +16,6 @@ type EditFormData = Partial<Task> & {
   estimatedMinutes?: number;
   customCategory?: string;
   impact?: string;
-  taskType?: string;
   deadlineType?: 'hard' | 'soft' | 'none';
   schedulingPreference?: 'consistent' | 'opportunistic' | 'intensive';
   targetFrequency?: 'daily' | 'weekly' | '3x-week' | 'flexible';
@@ -141,7 +140,6 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onUpdateTask, onDeleteTask, 
       category: task.category === 'Custom...' ? '' : task.category,
       customCategory: task.category && !['Academics', 'Organization', 'Work', 'Personal', 'Health', 'Learning', 'Finance', 'Home'].includes(task.category) ? task.category : '',
       impact: task.impact || (task.importance ? 'high' : 'low'),
-      taskType: task.taskType || '',
       deadlineType: task.deadlineType || (task.deadline ? 'hard' : 'none'),
       schedulingPreference: task.schedulingPreference || 'consistent',
       targetFrequency: task.targetFrequency || 'daily', // Default to daily for all tasks
@@ -185,7 +183,6 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onUpdateTask, onDeleteTask, 
         maxSessionLength: editFormData.maxSessionLength,
         isOneTimeTask: editFormData.isOneTimeTask,
         schedulingPreference: editFormData.schedulingPreference,
-        taskType: editFormData.taskType,
       });
       setEditingTaskId(null);
       setEditFormData({});
