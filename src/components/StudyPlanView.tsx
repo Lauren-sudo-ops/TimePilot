@@ -349,8 +349,8 @@ const StudyPlanView: React.FC<StudyPlanViewProps> = ({ studyPlans, tasks, fixedC
               <>
                 <p>You have missed {missedSessions.length} study session{missedSessions.length > 1 ? 's' : ''}. You can:</p>
                 <ul className="mt-2 space-y-1">
-                  <li>• <strong>Skip</strong> missed sessions (they won't be redistributed)</li>
-                  <li>• <strong>Smart Redistribution</strong> uses conflict-free scheduling with priority-based placement</li>
+                  <li>• <strong>Skip</strong> missed sessions (marks them as completed, won't be redistributed)</li>
+                  <li>• <strong>Redistribute Sessions</strong> reschedules missed sessions to future days</li>
                   <li>• <strong>Start studying</strong> any missed session now</li>
                 </ul>
               </>
