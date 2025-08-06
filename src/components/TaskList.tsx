@@ -139,8 +139,19 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onUpdateTask, onDeleteTask, 
     setShowAdvancedOptions(false);
   };
 
+  // Form validation for edit form
+  const isEditFormValid = React.useMemo(() => {
+    if (!editFormData.title?.trim()) return false;
+    const totalHours = (editFormData.estimatedHours || 0) + ((editFormData.estimatedMinutes || 0) / 60);
+    if (totalHours <= 0) return false;
+    if (!editFormData.impact) return false;
+    if (editFormData.deadline && editFormData.deadline < today) return false;
+    if (editFormData.category === 'Custom...' && !editFormData.customCategory?.trim()) return false;
+    return true;
+  }, [editFormData, today]);
+
   const saveEdit = () => {
-    if (editingTaskId && editFormData.title) {
+    if (editingTaskId && isEditFormValid) {
       const totalHours = (editFormData.estimatedHours || 0) + ((editFormData.estimatedMinutes || 0) / 60);
       const category = editFormData.category === 'Custom...' ? editFormData.customCategory : editFormData.category;
 
