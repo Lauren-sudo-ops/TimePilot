@@ -604,10 +604,26 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onUpdateTask, onDeleteTask, 
                       </div>
                     )}
 
+                    {/* Validation errors display */}
+                    {!isEditFormValid && editFormData.title && (
+                      <div className="text-red-600 text-sm space-y-1">
+                        {!editFormData.title?.trim() && <div>• Task title is required</div>}
+                        {((editFormData.estimatedHours || 0) + ((editFormData.estimatedMinutes || 0) / 60)) <= 0 && <div>• Estimated time must be greater than 0</div>}
+                        {!editFormData.impact && <div>• Priority level is required</div>}
+                        {editFormData.deadline && editFormData.deadline < today && <div>• Deadline cannot be in the past</div>}
+                        {editFormData.category === 'Custom...' && !editFormData.customCategory?.trim() && <div>• Custom category is required</div>}
+                      </div>
+                    )}
+
                     <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
                       <button
                         onClick={saveEdit}
-                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
+                        disabled={!isEditFormValid}
+                        className={`px-4 py-2 rounded-lg transition-colors text-sm font-medium ${
+                          isEditFormValid
+                            ? 'bg-blue-500 text-white hover:bg-blue-600'
+                            : 'bg-gray-300 text-gray-500 cursor-not-allowed dark:bg-gray-600 dark:text-gray-400'
+                        }`}
                       >
                         Save Changes
                       </button>
