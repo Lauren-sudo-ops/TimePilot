@@ -242,8 +242,8 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onUpdateTask, onDeleteTask, 
               >
               {editingTaskId === task.id ? (
                   <div className="space-y-4">
-                    {/* Task Title & Description */}
-                    <div className="grid grid-cols-1 gap-4">
+                    {/* Task Title & Category Row */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1">Task Title <span className="text-red-500">*</span></label>
                         <input
@@ -257,14 +257,39 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onUpdateTask, onDeleteTask, 
                       </div>
 
                       <div>
-                        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1">Description <span className="text-gray-400">(Optional)</span></label>
-                        <textarea
-                          value={editFormData.description || ''}
-                          onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
-                          className="w-full px-3 py-2 border rounded-lg text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none h-20 border-gray-300 bg-white dark:bg-gray-800 dark:text-white"
-                          placeholder="Describe the task..."
-                        />
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Category <span className="text-gray-400">(Optional)</span></label>
+                        <select
+                          value={editFormData.category || ''}
+                          onChange={(e) => setEditFormData({ ...editFormData, category: e.target.value, customCategory: '' })}
+                          className="w-full border rounded-lg px-3 py-2 text-base bg-white dark:bg-gray-800 dark:text-white"
+                        >
+                          <option value="">Select category...</option>
+                          {['Academics', 'Organization', 'Work', 'Personal', 'Health', 'Learning', 'Finance', 'Home', 'Custom...'].map(opt => (
+                            <option key={opt} value={opt}>{opt}</option>
+                          ))}
+                        </select>
+                        {editFormData.category === 'Custom...' && (
+                          <input
+                            type="text"
+                            value={editFormData.customCategory || ''}
+                            onChange={(e) => setEditFormData({ ...editFormData, customCategory: e.target.value })}
+                            className="w-full border rounded-lg px-3 py-2 mt-2 text-base bg-white dark:bg-gray-800 dark:text-white"
+                            placeholder="Enter custom category"
+                          />
+                        )}
                       </div>
+                    </div>
+
+                    {/* Description */}
+                    <div>
+
+                      <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1">Description <span className="text-gray-400">(Optional)</span></label>
+                      <textarea
+                        value={editFormData.description || ''}
+                        onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
+                        className="w-full px-3 py-2 border rounded-lg text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none h-20 border-gray-300 bg-white dark:bg-gray-800 dark:text-white"
+                        placeholder="Describe the task..."
+                      />
                     </div>
 
                     {/* Estimated Time */}
@@ -332,35 +357,23 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onUpdateTask, onDeleteTask, 
                         )}
                       </div>
 
-                      {/* Work Frequency Preference - Match TaskInput style */}
+                      {/* Work Frequency Preference - Dropdown */}
                       {!editFormData.isOneTimeTask && (
                         <div className="mt-4">
                           <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">
                             How often would you like to work on this?
                           </label>
-                          <div className="grid grid-cols-2 gap-2">
-                            {[
-                              { value: 'daily', label: '📅 Daily progress', desc: 'Work a bit each day' },
-                              { value: '3x-week', label: '🗓️ Few times per week', desc: 'Every 2-3 days' },
-                              { value: 'weekly', label: '📆 Weekly sessions', desc: 'Once per week' },
-                              { value: 'flexible', label: '⏰ When I have time', desc: 'Flexible scheduling' }
-                            ].map(option => (
-                              <label key={option.value} className={`flex flex-col p-3 border border-gray-200 dark:border-gray-600 rounded-xl hover:bg-white dark:hover:bg-gray-700 cursor-pointer transition-colors ${
-                                editFormData.targetFrequency === option.value ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-300 dark:border-blue-600' : ''
-                              }`}>
-                                <input
-                                  type="radio"
-                                  name="targetFrequency"
-                                  value={option.value}
-                                  checked={editFormData.targetFrequency === option.value}
-                                  onChange={() => setEditFormData({ ...editFormData, targetFrequency: option.value as any })}
-                                  className="sr-only"
-                                />
-                                <div className="text-sm font-medium text-gray-800 dark:text-white">{option.label}</div>
-                                <div className="text-xs text-gray-600 dark:text-gray-400">{option.desc}</div>
-                              </label>
-                            ))}
-                          </div>
+                          <select
+                            value={editFormData.targetFrequency || 'daily'}
+                            onChange={(e) => setEditFormData({ ...editFormData, targetFrequency: e.target.value as any })}
+                            className="w-full px-3 py-2 border rounded-lg text-base bg-white dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          >
+                            <option value="daily">📅 Daily progress - Work a bit each day</option>
+                            <option value="3x-week">🗓️ Few times per week - Every 2-3 days</option>
+                            <option value="weekly">📆 Weekly sessions - Once per week</option>
+                            <option value="flexible">⏰ When I have time - Flexible scheduling</option>
+                          </select>
+
                           {/* Show warning if frequency conflicts with deadline */}
                           {deadlineConflict.hasConflict && (
                             <div className="mt-2 p-2 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 rounded text-xs text-amber-700 dark:text-amber-200">
@@ -434,45 +447,6 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onUpdateTask, onDeleteTask, 
                             </button>
                           </div>
 
-                          {/* Category & Task Type */}
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Category <span className="text-gray-400">(Optional)</span></label>
-                              <select
-                                value={editFormData.category || ''}
-                                onChange={(e) => setEditFormData({ ...editFormData, category: e.target.value, customCategory: '' })}
-                                className="w-full border rounded-lg px-3 py-2 text-base bg-white dark:bg-gray-800 dark:text-white"
-                              >
-                                <option value="">Select category...</option>
-                                {['Academics', 'Organization', 'Work', 'Personal', 'Health', 'Learning', 'Finance', 'Home', 'Custom...'].map(opt => (
-                                  <option key={opt} value={opt}>{opt}</option>
-                                ))}
-                              </select>
-                              {editFormData.category === 'Custom...' && (
-                                <input
-                                  type="text"
-                                  value={editFormData.customCategory || ''}
-                                  onChange={(e) => setEditFormData({ ...editFormData, customCategory: e.target.value })}
-                                  className="w-full border rounded-lg px-3 py-2 mt-2 text-base bg-white dark:bg-gray-800 dark:text-white"
-                                  placeholder="Enter custom category"
-                                />
-                              )}
-                            </div>
-
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Task Type</label>
-                              <select
-                                value={editFormData.taskType || ''}
-                                onChange={(e) => setEditFormData({ ...editFormData, taskType: e.target.value })}
-                                className="w-full border rounded-lg px-3 py-2 text-base bg-white dark:bg-gray-800 dark:text-white"
-                              >
-                                <option value="">Select task type...</option>
-                                {['Planning', 'Creating', 'Learning', 'Administrative', 'Communicating', 'Deep Focus Work'].map(opt => (
-                                  <option key={opt} value={opt}>{opt}</option>
-                                ))}
-                              </select>
-                            </div>
-                          </div>
 
                           {/* Deadline Type Selection */}
                           <div className="space-y-2 mb-4">
@@ -562,36 +536,19 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onUpdateTask, onDeleteTask, 
                                   </div>
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-3">
-                                  <div>
-                                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">Minimum session</label>
-                                    <select
-                                      value={editFormData.minWorkBlock || 30}
-                                      onChange={(e) => setEditFormData({ ...editFormData, minWorkBlock: parseInt(e.target.value) })}
-                                      className="w-full px-2 py-1 border rounded text-sm bg-white dark:bg-gray-800 dark:text-white"
-                                    >
-                                      <option value={15}>15 minutes</option>
-                                      <option value={30}>30 minutes</option>
-                                      <option value={45}>45 minutes</option>
-                                      <option value={60}>1 hour</option>
-                                      <option value={90}>1.5 hours</option>
-                                    </select>
-                                  </div>
-
-                                  <div>
-                                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">Maximum session</label>
-                                    <select
-                                      value={editFormData.maxSessionLength || 2}
-                                      onChange={(e) => setEditFormData({ ...editFormData, maxSessionLength: parseInt(e.target.value) })}
-                                      className="w-full px-2 py-1 border rounded text-sm bg-white dark:bg-gray-800 dark:text-white"
-                                    >
-                                      <option value={1}>1 hour</option>
-                                      <option value={1.5}>1.5 hours</option>
-                                      <option value={2}>2 hours</option>
-                                      <option value={3}>3 hours</option>
-                                      <option value={4}>4 hours</option>
-                                    </select>
-                                  </div>
+                                <div>
+                                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">Maximum session length</label>
+                                  <select
+                                    value={editFormData.maxSessionLength || 2}
+                                    onChange={(e) => setEditFormData({ ...editFormData, maxSessionLength: parseInt(e.target.value) })}
+                                    className="w-full px-2 py-1 border rounded text-sm bg-white dark:bg-gray-800 dark:text-white"
+                                  >
+                                    <option value={1}>1 hour</option>
+                                    <option value={1.5}>1.5 hours</option>
+                                    <option value={2}>2 hours</option>
+                                    <option value={3}>3 hours</option>
+                                    <option value={4}>4 hours</option>
+                                  </select>
                                 </div>
                               </>
                             )}
