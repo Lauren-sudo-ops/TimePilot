@@ -234,29 +234,11 @@ const StudyPlanView: React.FC<StudyPlanViewProps> = ({ studyPlans, tasks, fixedC
     console.log('Missed session:', ms.task.title, 'on', ms.planDate, 'status:', checkSessionStatus(ms.session, ms.planDate));
   });
 
-  // Enhanced handler to skip a missed session with partial skip support
-  const handleSkipMissedSession = (planDate: string, sessionNumber: number, taskId: string, partialHours?: number) => {
-    if (partialHours) {
-      // Use enhanced skip functionality for partial skipping
-      const success = skipSessionEnhanced(studyPlans, planDate, sessionNumber, taskId, {
-        partialHours,
-        reason: 'user_choice'
-      });
-
-      if (success) {
-        setNotificationMessage(`Partially skipped ${formatTime(partialHours)} of session. Remaining time will be rescheduled.`);
-        // Force a re-render by calling the parent's redistribution handler
-        if (onRedistributeMissedSessions) {
-          onRedistributeMissedSessions();
-        }
-      } else {
-        setNotificationMessage('Failed to partially skip session.');
-      }
-    } else {
-      // Full skip using original method
-      onSkipMissedSession(planDate, sessionNumber, taskId);
-      setNotificationMessage('Session skipped! It will not be redistributed in future plans.');
-    }
+  // Handler to skip a missed session (full skip only)
+  const handleSkipMissedSession = (planDate: string, sessionNumber: number, taskId: string) => {
+    // Full skip using original method - treat as completed, no regeneration
+    onSkipMissedSession(planDate, sessionNumber, taskId);
+    setNotificationMessage('Session skipped! It will not be redistributed in future plans.');
   };
 
   // Enhanced redistribution handler
