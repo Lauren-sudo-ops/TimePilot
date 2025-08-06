@@ -359,13 +359,6 @@ const StudyPlanView: React.FC<StudyPlanViewProps> = ({ studyPlans, tasks, fixedC
                   'Smart Redistribution'
                 )}
               </button>
-              <button
-                onClick={onRedistributeMissedSessions || onGenerateStudyPlan}
-                className="px-4 py-2 bg-gray-500 text-white text-sm rounded-lg hover:bg-gray-600 transition-colors"
-                title="Use legacy redistribution method"
-              >
-                Legacy Mode
-              </button>
             </div>
           </div>
           
