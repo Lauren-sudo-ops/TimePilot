@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, BookOpen, TrendingUp, AlertTriangle, CheckCircle, Lightbulb, X, CheckCircle2, Clock3 } from 'lucide-react';
 import { StudyPlan, Task, StudySession, FixedCommitment, UserSettings } from '../types'; // Added FixedCommitment to imports
-import { formatTime, generateSmartSuggestions, getLocalDateString, checkSessionStatus, moveIndividualSession, redistributeMissedSessionsEnhanced, isTaskDeadlinePast } from '../utils/scheduling';
-import { RedistributionOptions } from '../types';
+import { formatTime, generateSmartSuggestions, getLocalDateString, checkSessionStatus, moveIndividualSession, isTaskDeadlinePast } from '../utils/scheduling';
 
 interface StudyPlanViewProps {
   studyPlans: StudyPlan[];
@@ -15,8 +14,8 @@ interface StudyPlanViewProps {
   onAddFixedCommitment?: (commitment: FixedCommitment) => void; // NEW PROP
   onSkipMissedSession: (planDate: string, sessionNumber: number, taskId: string) => void;
   onRedistributeMissedSessions?: () => void; // NEW PROP for redistribution
-  onEnhancedRedistribution?: () => void; // Enhanced redistribution prop
   onUpdateTask?: (taskId: string, updates: Partial<Task>) => void; // NEW PROP for task completion
+  onMarkMissedSessionDone?: (planDate: string, sessionNumber: number, taskId: string) => void; // NEW PROP for marking missed sessions as done
 }
 
 // Force warnings UI to be hidden for all users on first load unless they have a preference
@@ -26,7 +25,7 @@ if (typeof window !== 'undefined') {
   }
 }
 
-const StudyPlanView: React.FC<StudyPlanViewProps> = ({ studyPlans, tasks, fixedCommitments, onSelectTask, onGenerateStudyPlan, onUndoSessionDone, settings, onAddFixedCommitment, onSkipMissedSession, onRedistributeMissedSessions, onEnhancedRedistribution, onUpdateTask }) => {
+const StudyPlanView: React.FC<StudyPlanViewProps> = ({ studyPlans, tasks, fixedCommitments, onSelectTask, onGenerateStudyPlan, onUndoSessionDone, settings, onAddFixedCommitment, onSkipMissedSession, onRedistributeMissedSessions, onUpdateTask, onMarkMissedSessionDone }) => {
   const [notificationMessage, setNotificationMessage] = useState<string | null>(null);
   const [] = useState<{ taskTitle: string; unscheduledMinutes: number } | null>(null);
   const [showRegenerateConfirmation, setShowRegenerateConfirmation] = useState(false);
@@ -40,13 +39,8 @@ const StudyPlanView: React.FC<StudyPlanViewProps> = ({ studyPlans, tasks, fixedC
   const [, setShowPlanStaleNotif] = useState(true);
   // Smart assistant state
   const [showSmartAssistant, setShowSmartAssistant] = useState(false);
-  // Enhanced redistribution state
+  // Redistribution state
   const [redistributionInProgress, setRedistributionInProgress] = useState(false);
-  const [redistributionResults, setRedistributionResults] = useState<{
-    success: boolean;
-    message: string;
-    details?: { redistributed: number; failed: number; conflictsResolved: number };
-  } | null>(null);
   // Persist showWarnings in localStorage
   const [showWarnings, setShowWarningsRaw] = useState(() => {
     const saved = localStorage.getItem('timepilot-showWarnings');
@@ -257,61 +251,19 @@ const StudyPlanView: React.FC<StudyPlanViewProps> = ({ studyPlans, tasks, fixedC
     setNotificationMessage('Session skipped! It will not be redistributed in future plans.');
   };
 
-  // Enhanced redistribution handler
-  const handleEnhancedRedistribution = async () => {
+  // Redistribute handler - triggers study plan regeneration
+  const handleRedistribution = async () => {
     if (redistributionInProgress) return;
 
     setRedistributionInProgress(true);
-    setRedistributionResults(null);
 
     try {
-      // Use parent handler if available (preferred), otherwise use local implementation
-      if (onEnhancedRedistribution) {
-        onEnhancedRedistribution();
-        setRedistributionResults({
-          success: true,
-          message: 'Enhanced redistribution completed!'
-        });
-      } else {
-        // Fallback to local implementation
-        const options: RedistributionOptions = {
-          prioritizeMissedSessions: true,
-          respectDailyLimits: true,
-          allowWeekendOverflow: false,
-          maxRedistributionDays: 14
-        };
-
-        const result = redistributeMissedSessionsEnhanced(
-          studyPlans,
-          settings,
-          fixedCommitments,
-          tasks,
-          options
-        );
-
-        setRedistributionResults({
-          success: result.totalSessionsMoved > 0,
-          message: result.totalSessionsMoved > 0
-            ? `Successfully redistributed ${result.totalSessionsMoved} session${result.totalSessionsMoved > 1 ? 's' : ''}!`
-            : 'No sessions could be redistributed. Check your schedule for available time slots.',
-          details: {
-            redistributed: result.totalSessionsMoved,
-            failed: result.failedSessions.length,
-            conflictsResolved: result.conflictsResolved
-          }
-        });
-
-        if (result.totalSessionsMoved > 0) {
-          setNotificationMessage(`Redistribution complete: ${result.totalSessionsMoved} sessions moved, ${result.failedSessions.length} failed`);
-        }
-      }
-
+      // Trigger study plan regeneration instead of redistribution
+      onGenerateStudyPlan();
+      setNotificationMessage('Study plan regenerated successfully! Missed sessions have been incorporated into the new plan.');
     } catch (error) {
-      console.error('Enhanced redistribution failed:', error);
-      setRedistributionResults({
-        success: false,
-        message: 'Redistribution failed due to an error. Please try again.'
-      });
+      console.error('Study plan regeneration failed:', error);
+      setNotificationMessage('Failed to regenerate study plan. Please try again.');
     } finally {
       setRedistributionInProgress(false);
     }
@@ -334,32 +286,13 @@ const StudyPlanView: React.FC<StudyPlanViewProps> = ({ studyPlans, tasks, fixedC
 
   // Handler for marking individual missed sessions as done
   const handleMarkMissedSessionDone = (planDate: string, sessionNumber: number, taskId: string) => {
-    // Note: setStudyPlans is not available in this component as it receives studyPlans as prop
-    // This functionality should be handled by the parent component
-    setNotificationMessage('Session marking functionality needs to be implemented by parent component');
-    // TODO: Add onMarkSessionDone prop to handle this in parent component
-    /*
-    setStudyPlans((prevPlans: StudyPlan[]) => {
-      return prevPlans.map((plan: StudyPlan) => {
-        if (plan.date !== planDate) return plan;
-
-        return {
-          ...plan,
-          plannedTasks: plan.plannedTasks.map((session: StudySession) => {
-            if (session.taskId === taskId && session.sessionNumber === sessionNumber) {
-              return {
-                ...session,
-                done: true,
-                status: 'completed' as const,
-                completedAt: new Date().toISOString()
-              };
-            }
-            return session;
-          })
-        };
-      });
-    });
-    */
+    if (onMarkMissedSessionDone) {
+      onMarkMissedSessionDone(planDate, sessionNumber, taskId);
+      const task = getTaskById(taskId);
+      setNotificationMessage(`Session for "${task?.title || 'Unknown Task'}" marked as completed`);
+    } else {
+      setNotificationMessage('Session marking functionality not available');
+    }
     setTimeout(() => setNotificationMessage(null), 3000);
   };
 
@@ -385,15 +318,15 @@ const StudyPlanView: React.FC<StudyPlanViewProps> = ({ studyPlans, tasks, fixedC
             </div>
             <div className="flex space-x-2">
               <button
-                onClick={handleEnhancedRedistribution}
+                onClick={handleRedistribution}
                 disabled={redistributionInProgress || !canRedistribute}
                 className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-sm rounded-lg hover:from-blue-600 hover:to-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                title={canRedistribute ? "Intelligently redistribute missed sessions with conflict prevention" : "Redistribution disabled - no sessions with future deadlines to redistribute"}
+                title={canRedistribute ? "Regenerate study plan to incorporate missed sessions" : "Redistribution disabled - no sessions with future deadlines to redistribute"}
               >
                 {redistributionInProgress ? (
                   <div className="flex items-center space-x-2">
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    <span>Redistributing...</span>
+                    <span>Regenerating...</span>
                   </div>
                 ) : (
                   'Redistribute Sessions'
@@ -410,7 +343,7 @@ const StudyPlanView: React.FC<StudyPlanViewProps> = ({ studyPlans, tasks, fixedC
                   <li>• <strong>Skip</strong> any missed session (marks as completed, won't be redistributed)</li>
                   <li>• <strong>Start studying</strong> any missed session now</li>
                   {missedSessions.length > 0 && (
-                    <li>• <strong>Redistribute Sessions</strong> reschedules sessions for tasks with future deadlines</li>
+                    <li>• <strong>Redistribute Sessions</strong> regenerates your study plan to incorporate missed sessions</li>
                   )}
                   {overdueMissedSessions.length > 0 && (
                     <>
@@ -431,39 +364,6 @@ const StudyPlanView: React.FC<StudyPlanViewProps> = ({ studyPlans, tasks, fixedC
             )}
           </div>
 
-          {/* Redistribution Results */}
-          {redistributionResults && (
-            <div className={`mb-4 p-4 rounded-lg border-l-4 ${
-              redistributionResults.success
-                ? 'bg-green-50 border-green-500 dark:bg-green-900/20 dark:border-green-400'
-                : 'bg-red-50 border-red-500 dark:bg-red-900/20 dark:border-red-400'
-            }`}>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className={`font-medium ${
-                    redistributionResults.success
-                      ? 'text-green-800 dark:text-green-200'
-                      : 'text-red-800 dark:text-red-200'
-                  }`}>
-                    {redistributionResults.message}
-                  </p>
-                  {redistributionResults.details && (
-                    <div className="mt-2 text-xs text-gray-600 dark:text-gray-300">
-                      <p>• Sessions redistributed: {redistributionResults.details.redistributed}</p>
-                      <p>• Failed redistributions: {redistributionResults.details.failed}</p>
-                      <p>• Conflicts resolved: {redistributionResults.details.conflictsResolved}</p>
-                    </div>
-                  )}
-                </div>
-                <button
-                  onClick={() => setRedistributionResults(null)}
-                  className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-                >
-                  <X size={16} />
-                </button>
-              </div>
-            </div>
-          )}
 
           <div className="space-y-3">
             {/* Redistributable Sessions */}
