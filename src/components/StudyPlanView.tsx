@@ -363,14 +363,27 @@ const StudyPlanView: React.FC<StudyPlanViewProps> = ({ studyPlans, tasks, fixedC
           </div>
           
           <div className="mb-4 text-sm text-gray-600 dark:text-gray-300">
-            {missedSessions.length > 0 ? (
+            {(missedSessions.length > 0 || overdueMissedSessions.length > 0) ? (
               <>
-                <p>You have missed {missedSessions.length} study session{missedSessions.length > 1 ? 's' : ''}. You can:</p>
+                <p>You have missed study sessions. Available actions:</p>
                 <ul className="mt-2 space-y-1">
-                  <li>• <strong>Skip</strong> missed sessions (marks them as completed, won't be redistributed)</li>
-                  <li>• <strong>Redistribute Sessions</strong> reschedules missed sessions to future days</li>
+                  <li>• <strong>Skip</strong> any missed session (marks as completed, won't be redistributed)</li>
                   <li>• <strong>Start studying</strong> any missed session now</li>
+                  {missedSessions.length > 0 && (
+                    <li>• <strong>Redistribute Sessions</strong> reschedules sessions for tasks with future deadlines</li>
+                  )}
+                  {overdueMissedSessions.length > 0 && (
+                    <li>• <strong>Mark as Done</strong> completes overdue tasks (deadline already passed)</li>
+                  )}
                 </ul>
+                {hasOverdueSessions && (
+                  <div className="mt-3 p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-700">
+                    <p className="text-orange-800 dark:text-orange-200 text-xs">
+                      <strong>Note:</strong> Sessions for tasks with passed deadlines cannot be redistributed.
+                      You can either work on them now, skip the sessions, or mark the entire task as completed.
+                    </p>
+                  </div>
+                )}
               </>
             ) : (
               <p>No missed sessions found. All past study sessions have been completed or are up to date.</p>
