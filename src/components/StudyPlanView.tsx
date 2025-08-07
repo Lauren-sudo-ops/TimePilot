@@ -187,27 +187,33 @@ const StudyPlanView: React.FC<StudyPlanViewProps> = ({ studyPlans, tasks, fixedC
 
   // --- Missed Sessions Section ---
   // Gather all missed sessions from past studyPlans (excluding today's overdue sessions)
-  const missedSessions: Array<{planDate: string, session: StudySession, task: Task}> = [];
-  
+  const allMissedSessions: Array<{planDate: string, session: StudySession, task: Task}> = [];
+
   // Only include past plans (not today's plan)
   const plansToCheck = studyPlans.filter(plan => plan.date < today);
-  
+
   plansToCheck.forEach(plan => {
     plan.plannedTasks.forEach(session => {
       const sessionStatus = checkSessionStatus(session, plan.date);
       // Only consider sessions as missed if they were originally scheduled for that date
       // and not redistributed there
       const isRedistributedToPast = session.originalTime && session.originalDate && plan.date < today;
-      
+
       if (sessionStatus === 'missed' && !isRedistributedToPast) {
         const task = getTaskById(session.taskId);
         if (task) {
           console.log(`Found missed session: ${task.title} on ${plan.date}, status: ${sessionStatus}, sessionNumber: ${session.sessionNumber}`);
-          missedSessions.push({ planDate: plan.date, session, task });
+          allMissedSessions.push({ planDate: plan.date, session, task });
         }
       }
     });
   });
+
+  // Categorize missed sessions by overdue status
+  const missedSessions = allMissedSessions.filter(({task}) => !isTaskDeadlinePast(task.deadline));
+  const overdueMissedSessions = allMissedSessions.filter(({task}) => isTaskDeadlinePast(task.deadline));
+  const hasOverdueSessions = overdueMissedSessions.length > 0;
+  const canRedistribute = missedSessions.length > 0;
 
   // Debug logging
   console.log('Today:', today);
