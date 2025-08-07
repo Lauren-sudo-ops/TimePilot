@@ -744,7 +744,7 @@ function App() {
         
         // Regenerate study plan with new commitment
         if (tasks.length > 0) {
-            const { plans: newPlans } = generateNewStudyPlan(tasks, settings, updatedCommitments, studyPlans);
+            const { plans: newPlans } = await generateNewStudyPlan(tasks, settings, updatedCommitments, studyPlans);
             
             // Preserve session status from previous plan
             newPlans.forEach(plan => {
