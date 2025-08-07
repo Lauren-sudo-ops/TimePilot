@@ -600,33 +600,40 @@ function App() {
         }
     };
 
-    // Handle redistribution of missed sessions specifically (legacy method)
-    const handleRedistributeMissedSessions = () => {
+    // Handle redistribution of missed sessions specifically using unified system
+    const handleRedistributeMissedSessions = async () => {
         if (tasks.length > 0) {
-            // Use enhanced redistribution with detailed feedback
-            const { updatedPlans, feedback } = redistributeMissedSessionsWithFeedback(studyPlans, settings, fixedCommitments, tasks);
+            try {
+                // Use the unified redistribution system for missed sessions only
+                const result = await generateNewStudyPlan(tasks, settings, fixedCommitments, studyPlans, {
+                    respectDailyLimits: true,
+                    allowWeekendOverflow: false,
+                    maxRedistributionDays: 14,
+                    prioritizeImportantTasks: true,
+                    preserveSessionSize: true,
+                    enableRollback: true
+                });
 
-            if (feedback.success) {
-                setStudyPlans(updatedPlans);
-                setNotificationMessage(feedback.message);
+                if (result.redistributionResult?.success) {
+                    setStudyPlans(result.plans);
+                    setNotificationMessage(result.redistributionResult.feedback);
 
-                // Log detailed information for debugging
-                console.log('Redistribution details:', feedback.details);
-            } else {
-                setNotificationMessage(feedback.message);
+                    // Log detailed information for debugging
+                    console.log('Unified redistribution details:', result.redistributionResult);
+                } else {
+                    setNotificationMessage(result.redistributionResult?.feedback || 'Redistribution completed with no changes.');
 
-                // Log conflicts and issues for debugging
-                if (feedback.details.conflictsDetected || feedback.details.issues.length > 0 || feedback.details.remainingMissed > 0) {
-                    console.warn('Redistribution issues detected:', {
-                        totalMissed: feedback.details.totalMissed,
-                        successfullyMoved: feedback.details.successfullyMoved,
-                        failedToMove: feedback.details.failedToMove,
-                        remainingMissed: feedback.details.remainingMissed,
-                        conflictsDetected: feedback.details.conflictsDetected,
-                        issues: feedback.details.issues,
-                        suggestions: feedback.details.suggestions
-                    });
+                    // Log any issues
+                    if (result.redistributionResult?.failedSessions.length) {
+                        console.warn('Some sessions could not be redistributed:', result.redistributionResult.failedSessions);
+                    }
                 }
+
+                setTimeout(() => setNotificationMessage(''), 5000);
+            } catch (error) {
+                console.error('Unified redistribution failed:', error);
+                setNotificationMessage('Redistribution failed. Please try again.');
+                setTimeout(() => setNotificationMessage(''), 5000);
             }
         }
     };
