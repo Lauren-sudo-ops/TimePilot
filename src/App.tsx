@@ -566,34 +566,36 @@ function App() {
     };
 
     // Enhanced redistribution handler with conflict prevention
-    const handleEnhancedRedistribution = () => {
+    const handleEnhancedRedistribution = async () => {
         if (tasks.length > 0) {
-            const options: RedistributionOptions = {
-                prioritizeMissedSessions: true,
-                respectDailyLimits: true,
-                allowWeekendOverflow: false,
-                maxRedistributionDays: 14
-            };
-
             try {
-                const result = redistributeMissedSessionsEnhanced(
-                    studyPlans,
-                    settings,
-                    fixedCommitments,
-                    tasks,
-                    options
-                );
+                // Use the new unified redistribution system
+                const result = await generateNewStudyPlan(tasks, settings, fixedCommitments, studyPlans, {
+                    prioritizeImportantTasks: true,
+                    respectDailyLimits: true,
+                    allowWeekendOverflow: false,
+                    maxRedistributionDays: 14,
+                    preserveSessionSize: true,
+                    enableRollback: true
+                });
 
-                if (result.totalSessionsMoved > 0) {
+                setStudyPlans(result.plans);
+
+                if (result.redistributionResult?.success && result.redistributionResult.redistributedSessions.length > 0) {
                     setNotificationMessage(
-                        `Enhanced redistribution complete: ${result.totalSessionsMoved} sessions moved, ${result.failedSessions.length} failed, ${result.conflictsResolved} conflicts resolved`
+                        `Enhanced redistribution complete: ${result.redistributionResult.redistributedSessions.length} sessions moved, ${result.redistributionResult.failedSessions.length} failed`
                     );
+                } else if (result.redistributionResult?.failedSessions.length === 0) {
+                    setNotificationMessage('No missed sessions found to redistribute.');
                 } else {
-                    setNotificationMessage('No sessions could be redistributed. Check your schedule for available time slots.');
+                    setNotificationMessage('Some sessions could not be redistributed. Check your schedule for available time slots.');
                 }
+
+                setTimeout(() => setNotificationMessage(''), 5000);
             } catch (error) {
                 console.error('Enhanced redistribution failed:', error);
                 setNotificationMessage('Enhanced redistribution failed. Please try again.');
+                setTimeout(() => setNotificationMessage(''), 5000);
             }
         }
     };
