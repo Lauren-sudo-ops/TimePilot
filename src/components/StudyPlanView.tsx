@@ -412,52 +412,134 @@ const StudyPlanView: React.FC<StudyPlanViewProps> = ({ studyPlans, tasks, fixedC
           )}
 
           <div className="space-y-3">
-                        {missedSessions.length > 0 ? (
-              missedSessions.map(({planDate, session, task}, idx) => (
-                <div key={`missed-${planDate}-${session.sessionNumber || 0}-${task.id}-${session.startTime || ''}-${idx}`} 
-                     className="flex items-center justify-between bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all duration-200">
-                <div className="flex-1">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <BookOpen className="text-blue-500 dark:text-blue-400" size={18} />
-                    <h3 className="font-medium text-gray-800 dark:text-white">{task.title}</h3>
-                    {task.category && (
-                      <span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full dark:bg-blue-900 dark:text-blue-300">
-                        {task.category}
-                      </span>
-                    )}
+            {/* Redistributable Sessions */}
+            {missedSessions.length > 0 && (
+              <div className="space-y-3">
+                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Sessions that can be redistributed:
+                </h3>
+                {missedSessions.map(({planDate, session, task}, idx) => (
+                  <div key={`missed-${planDate}-${session.sessionNumber || 0}-${task.id}-${session.startTime || ''}-${idx}`}
+                       className="flex items-center justify-between bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all duration-200">
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <BookOpen className="text-blue-500 dark:text-blue-400" size={18} />
+                        <h3 className="font-medium text-gray-800 dark:text-white">{task.title}</h3>
+                        {task.category && (
+                          <span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full dark:bg-blue-900 dark:text-blue-300">
+                            {task.category}
+                          </span>
+                        )}
+                        <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full dark:bg-green-900 dark:text-green-300">
+                          Due: {new Date(task.deadline).toLocaleDateString()}
+                        </span>
+                      </div>
+                      <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
+                        <span className="flex items-center space-x-1">
+                          <Calendar size={14} />
+                          <span>{planDate}</span>
+                        </span>
+                        <span className="flex items-center space-x-1">
+                          <Clock size={14} />
+                          <span>{session.startTime} - {session.endTime}</span>
+                        </span>
+                        <span className="flex items-center space-x-1">
+                          <TrendingUp size={14} />
+                          <span>{formatTime(session.allocatedHours)}</span>
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() => onSelectTask(task, { allocatedHours: session.allocatedHours, planDate, sessionNumber: session.sessionNumber })}
+                        className="px-3 py-1 text-xs bg-green-100 text-green-800 rounded-lg hover:bg-green-200 transition-colors duration-200 dark:bg-green-900 dark:text-green-200 dark:hover:bg-green-800"
+                      >
+                        Start Now
+                      </button>
+                      <button
+                        onClick={() => handleSkipMissedSession(planDate, session.sessionNumber || 0, task.id)}
+                        className="px-3 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-lg hover:bg-yellow-200 transition-colors duration-200 dark:bg-yellow-900 dark:text-yellow-200 dark:hover:bg-yellow-800"
+                      >
+                        Skip
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
-                    <span className="flex items-center space-x-1">
-                      <Calendar size={14} />
-                      <span>{planDate}</span>
-                    </span>
-                    <span className="flex items-center space-x-1">
-                      <Clock size={14} />
-                      <span>{session.startTime} - {session.endTime}</span>
-                    </span>
-                    <span className="flex items-center space-x-1">
-                      <TrendingUp size={14} />
-                      <span>{formatTime(session.allocatedHours)}</span>
-                    </span>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={() => onSelectTask(task, { allocatedHours: session.allocatedHours, planDate, sessionNumber: session.sessionNumber })}
-                    className="px-3 py-1 text-xs bg-green-100 text-green-800 rounded-lg hover:bg-green-200 transition-colors duration-200 dark:bg-green-900 dark:text-green-200 dark:hover:bg-green-800"
-                  >
-                    Start Now
-                  </button>
-                  <button
-                    onClick={() => handleSkipMissedSession(planDate, session.sessionNumber || 0, task.id)}
-                    className="px-3 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-lg hover:bg-yellow-200 transition-colors duration-200 dark:bg-yellow-900 dark:text-yellow-200 dark:hover:bg-yellow-800"
-                  >
-                    Skip
-                  </button>
-                </div>
+                ))}
               </div>
-            ))
-            ) : (
+            )}
+
+            {/* Overdue Sessions */}
+            {overdueMissedSessions.length > 0 && (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-medium text-orange-700 dark:text-orange-300 mb-2">
+                    Sessions for overdue tasks (deadline passed):
+                  </h3>
+                  <span className="text-xs text-orange-600 dark:text-orange-400">
+                    Redistribution not available
+                  </span>
+                </div>
+                {overdueMissedSessions.map(({planDate, session, task}, idx) => (
+                  <div key={`overdue-${planDate}-${session.sessionNumber || 0}-${task.id}-${session.startTime || ''}-${idx}`}
+                       className="flex items-center justify-between bg-orange-50 dark:bg-orange-900/20 rounded-lg p-4 border border-orange-200 dark:border-orange-700 hover:shadow-md transition-all duration-200">
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <BookOpen className="text-orange-500 dark:text-orange-400" size={18} />
+                        <h3 className="font-medium text-gray-800 dark:text-white">{task.title}</h3>
+                        {task.category && (
+                          <span className="px-2 py-1 text-xs bg-orange-100 text-orange-800 rounded-full dark:bg-orange-900 dark:text-orange-300">
+                            {task.category}
+                          </span>
+                        )}
+                        <span className="px-2 py-1 text-xs bg-red-100 text-red-800 rounded-full dark:bg-red-900 dark:text-red-300">
+                          Overdue: {new Date(task.deadline).toLocaleDateString()}
+                        </span>
+                      </div>
+                      <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
+                        <span className="flex items-center space-x-1">
+                          <Calendar size={14} />
+                          <span>{planDate}</span>
+                        </span>
+                        <span className="flex items-center space-x-1">
+                          <Clock size={14} />
+                          <span>{session.startTime} - {session.endTime}</span>
+                        </span>
+                        <span className="flex items-center space-x-1">
+                          <TrendingUp size={14} />
+                          <span>{formatTime(session.allocatedHours)}</span>
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() => onSelectTask(task, { allocatedHours: session.allocatedHours, planDate, sessionNumber: session.sessionNumber })}
+                        className="px-3 py-1 text-xs bg-green-100 text-green-800 rounded-lg hover:bg-green-200 transition-colors duration-200 dark:bg-green-900 dark:text-green-200 dark:hover:bg-green-800"
+                      >
+                        Start Now
+                      </button>
+                      <button
+                        onClick={() => handleSkipMissedSession(planDate, session.sessionNumber || 0, task.id)}
+                        className="px-3 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-lg hover:bg-yellow-200 transition-colors duration-200 dark:bg-yellow-900 dark:text-yellow-200 dark:hover:bg-yellow-800"
+                      >
+                        Skip
+                      </button>
+                      {onUpdateTask && (
+                        <button
+                          onClick={() => handleMarkTaskAsCompleted(task.id)}
+                          className="px-3 py-1 text-xs bg-purple-100 text-purple-800 rounded-lg hover:bg-purple-200 transition-colors duration-200 dark:bg-purple-900 dark:text-purple-200 dark:hover:bg-purple-800"
+                          title="Mark the entire task as completed"
+                        >
+                          Mark as Done
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* No sessions found */}
+            {missedSessions.length === 0 && overdueMissedSessions.length === 0 && (
               <div className="text-center py-4 text-gray-500 dark:text-gray-400">
                 <CheckCircle className="text-green-500 dark:text-green-400 mx-auto mb-2" size={24} />
                 <p>All past sessions are up to date!</p>
