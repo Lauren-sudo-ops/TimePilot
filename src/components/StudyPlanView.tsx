@@ -323,6 +323,34 @@ const StudyPlanView: React.FC<StudyPlanViewProps> = ({ studyPlans, tasks, fixedC
     }
   };
 
+  // Handler for marking individual missed sessions as done
+  const handleMarkMissedSessionDone = (planDate: string, sessionNumber: number, taskId: string) => {
+    // First mark the session as done in the study plans
+    setStudyPlans(prevPlans => {
+      return prevPlans.map(plan => {
+        if (plan.date !== planDate) return plan;
+
+        return {
+          ...plan,
+          plannedTasks: plan.plannedTasks.map(session => {
+            if (session.taskId === taskId && session.sessionNumber === sessionNumber) {
+              return {
+                ...session,
+                done: true,
+                status: 'completed' as const,
+                completedAt: new Date().toISOString()
+              };
+            }
+            return session;
+          })
+        };
+      });
+    });
+
+    setNotificationMessage('Session marked as completed');
+    setTimeout(() => setNotificationMessage(null), 3000);
+  };
+
   return (
     <div className="space-y-6 relative study-plan-container">
       {/* Missed Sessions Section */}
