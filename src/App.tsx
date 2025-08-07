@@ -514,18 +514,9 @@ function App() {
                 }
             }
 
-            // Generate new study plan with existing plans for progress calculation and missed session redistribution
-            const result = await generateNewStudyPlan(tasks, settings, fixedCommitments, studyPlans);
+            // Generate new study plan
+            const result = generateNewStudyPlan(tasks, settings, fixedCommitments, studyPlans);
             const newPlans = result.plans;
-
-            // Show redistribution feedback
-            if (result.redistributionResult?.success && result.redistributionResult.redistributedSessions.length > 0) {
-                setNotificationMessage(`Study plan generated! ${result.redistributionResult.redistributedSessions.length} missed sessions redistributed.`);
-                setTimeout(() => setNotificationMessage(''), 5000);
-            } else if (result.redistributionResult && !result.redistributionResult.success) {
-                setNotificationMessage(`Study plan generated! Some missed sessions could not be redistributed: ${result.redistributionResult.feedback}`);
-                setTimeout(() => setNotificationMessage(''), 7000);
-            }
             
             // Preserve session status from previous plan
             newPlans.forEach(plan => {
