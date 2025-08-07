@@ -408,15 +408,12 @@ const StudyPlanView: React.FC<StudyPlanViewProps> = ({ studyPlans, tasks, fixedC
                 <p>You have missed study sessions. Available actions:</p>
                 <ul className="mt-2 space-y-1">
                   <li>• <strong>Skip</strong> any missed session (marks as completed, won't be redistributed)</li>
-                  <li>• <strong>Mark Done</strong> marks individual sessions as completed</li>
                   <li>• <strong>Start studying</strong> any missed session now</li>
                   {missedSessions.length > 0 && (
                     <li>• <strong>Redistribute Sessions</strong> reschedules sessions for tasks with future deadlines</li>
                   )}
                   {overdueMissedSessions.length > 0 && (
                     <>
-                      <li>• <strong>Mark Done</strong> marks individual sessions as completed</li>
-                      <li>• <strong>Mark Task Done</strong> completes entire overdue task (deadline already passed)</li>
                     </>
                   )}
                 </ul>
@@ -518,13 +515,6 @@ const StudyPlanView: React.FC<StudyPlanViewProps> = ({ studyPlans, tasks, fixedC
                         className="px-3 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-lg hover:bg-yellow-200 transition-colors duration-200 dark:bg-yellow-900 dark:text-yellow-200 dark:hover:bg-yellow-800"
                       >
                         Skip
-                      </button>
-                      <button
-                        onClick={() => handleMarkMissedSessionDone(planDate, session.sessionNumber || 0, task.id)}
-                        className="px-3 py-1 text-xs bg-purple-100 text-purple-800 rounded-lg hover:bg-purple-200 transition-colors duration-200 dark:bg-purple-900 dark:text-purple-200 dark:hover:bg-purple-800"
-                        title="Mark this session as completed"
-                      >
-                        Mark Done
                       </button>
                     </div>
                   </div>
