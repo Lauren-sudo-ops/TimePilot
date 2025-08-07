@@ -1698,9 +1698,9 @@ function App() {
                         </div>
                         <div className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent drop-shadow-sm">TimePilot</div>
                     </div>
-                    <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-2 sm:space-x-3 md:space-x-4">
                         <button
-                            className={`flex items-center rounded-2xl p-3 backdrop-blur-lg transition-all duration-300 z-50 border-2 ${
+                            className={`flex items-center rounded-xl sm:rounded-2xl p-2 sm:p-3 backdrop-blur-lg transition-all duration-300 z-50 border-2 ${
                               hasUnscheduled ?
                                 notificationPriority === 'critical' ? 'bg-red-500/15 border-red-400/40 shadow-xl shadow-red-500/20 animate-pulse hover:bg-red-500/25' :
                                 notificationPriority === 'high' ? 'bg-orange-500/15 border-orange-400/40 shadow-xl shadow-orange-500/20 animate-bounce hover:bg-orange-500/25' :
@@ -1722,35 +1722,35 @@ function App() {
                             style={{ outline: 'none', border: 'none' }}
                             disabled={!hasUnscheduled}
                         >
-                            <Lightbulb className={`w-5 h-5 sm:w-6 sm:h-6`} fill={hasUnscheduled ?
+                            <Lightbulb className={`w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6`} fill={hasUnscheduled ?
                               notificationPriority === 'critical' ? '#dc2626' :
                               notificationPriority === 'high' ? '#ea580c' :
                               '#fde047'
                             : 'none'} />
                         </button>
                         <button
-                            className="relative p-3 backdrop-blur-lg bg-white/15 dark:bg-gray-800/20 border-2 border-white/30 dark:border-gray-600/30 rounded-2xl text-gray-600 dark:text-gray-300 hover:bg-white/25 dark:hover:bg-gray-700/30 transition-all duration-300 hover:scale-105 hover:shadow-xl"
+                            className="relative p-2 sm:p-3 backdrop-blur-lg bg-white/15 dark:bg-gray-800/20 border-2 border-white/30 dark:border-gray-600/30 rounded-xl sm:rounded-2xl text-gray-600 dark:text-gray-300 hover:bg-white/25 dark:hover:bg-gray-700/30 transition-all duration-300 hover:scale-105 hover:shadow-xl"
                             onClick={() => setShowGamificationPanel(!showGamificationPanel)}
                             title="Progress & Achievements"
                         >
-                            <Trophy size={20} />
+                            <Trophy className="w-4 h-4 sm:w-5 sm:h-5" />
                         </button>
                         <button
-                            className="p-3 backdrop-blur-lg bg-white/15 dark:bg-gray-800/20 border-2 border-white/30 dark:border-gray-600/30 rounded-2xl text-gray-600 dark:text-gray-300 hover:bg-white/25 dark:hover:bg-gray-700/30 transition-all duration-300 hover:scale-105 hover:shadow-xl"
+                            className="p-2 sm:p-3 backdrop-blur-lg bg-white/15 dark:bg-gray-800/20 border-2 border-white/30 dark:border-gray-600/30 rounded-xl sm:rounded-2xl text-gray-600 dark:text-gray-300 hover:bg-white/25 dark:hover:bg-gray-700/30 transition-all duration-300 hover:scale-105 hover:shadow-xl"
                             onClick={() => setShowHelpModal(true)}
                             title="Help & FAQ"
                         >
-                            <HelpCircle size={20} />
+                            <HelpCircle className="w-4 h-4 sm:w-5 sm:h-5" />
                         </button>
                         <button
-                            className={`lg:hidden p-3 backdrop-blur-lg border-2 rounded-2xl text-gray-600 dark:text-gray-300 transition-all duration-300 hover:scale-105 hover:shadow-xl ${
+                            className={`lg:hidden p-2 sm:p-3 backdrop-blur-lg border-2 rounded-xl sm:rounded-2xl text-gray-600 dark:text-gray-300 transition-all duration-300 hover:scale-105 hover:shadow-xl ${
                                 mobileMenuOpen 
                                     ? 'bg-blue-500/20 dark:bg-blue-600/25 border-blue-400/50 dark:border-blue-500/50 text-blue-700 dark:text-blue-300' 
                                     : 'bg-white/15 dark:bg-gray-800/20 border-white/30 dark:border-gray-600/30 hover:bg-white/25 dark:hover:bg-gray-700/30'
                             }`}
                             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                         >
-                            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                            {mobileMenuOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6" />}
                         </button>
                     </div>
                 </header>
