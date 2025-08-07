@@ -32,10 +32,16 @@ export interface SessionSchedulingMetadata {
     from: { date: string; startTime: string; endTime: string };
     to: { date: string; startTime: string; endTime: string };
     timestamp: string;
-    reason: 'missed' | 'manual' | 'conflict' | 'redistribution';
+    reason: 'missed' | 'manual' | 'conflict' | 'redistribution' | 'unified_redistribution';
+    success?: boolean;
   }>;
   redistributionRound?: number;
-  priority: number; // Calculated priority for redistribution
+  priority?: number; // Calculated priority for redistribution
+  // Enhanced metadata for unified redistribution
+  failureReasons?: string[];
+  successfulMoves?: number;
+  lastProcessedAt?: string;
+  state?: 'scheduled' | 'in_progress' | 'completed' | 'missed_original' | 'redistributed' | 'failed_redistribution' | 'skipped_user' | 'skipped_system';
 }
 
 export interface SkipMetadata {
