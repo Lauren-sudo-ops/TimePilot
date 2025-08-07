@@ -19,15 +19,16 @@ export const generateStudyPlanWithUnifiedRedistribution = async (
   settings: UserSettings,
   fixedCommitments: FixedCommitment[],
   existingStudyPlans: StudyPlan[] = [],
-  redistributionOptions: Partial<UnifiedRedistributionOptions> = {}
-): Promise<{ 
-  plans: StudyPlan[]; 
+  redistributionOptions: Partial<UnifiedRedistributionOptions & { useTaskAwareRedistribution?: boolean }> = {}
+): Promise<{
+  plans: StudyPlan[];
   suggestions: Array<{ taskTitle: string; unscheduledMinutes: number }>;
   redistributionResult?: {
     success: boolean;
     redistributedSessions: StudySession[];
     failedSessions: StudySession[];
     feedback: string;
+    redistributionMethod?: 'task-aware' | 'session-based';
   };
 }> => {
 
