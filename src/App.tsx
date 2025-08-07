@@ -462,7 +462,7 @@ function App() {
 
                 if (shouldPreserveReschedules) {
                     // Generate plan but preserve manual reschedules
-                    const result = await generateNewStudyPlan(tasks, settings, fixedCommitments, studyPlans);
+                    const result = generateNewStudyPlan(tasks, settings, fixedCommitments, studyPlans);
                     const newPlans = result.plans;
                     
                     // Enhanced preservation logic
@@ -622,7 +622,7 @@ function App() {
               `• Adjust your study window hours in Settings\n`
             );
             setTasks(tasks);
-            const { plans: restoredPlans } = await generateNewStudyPlan(tasks, settings, fixedCommitments, studyPlans);
+            const { plans: restoredPlans } = generateNewStudyPlan(tasks, settings, fixedCommitments, studyPlans);
             setStudyPlans(restoredPlans);
             setShowTaskInput(false);
             setLastPlanStaleReason("task");
@@ -684,7 +684,7 @@ function App() {
         
         // Regenerate study plan with new commitment
         if (tasks.length > 0) {
-            const { plans: newPlans } = await generateNewStudyPlan(tasks, settings, updatedCommitments, studyPlans);
+            const { plans: newPlans } = generateNewStudyPlan(tasks, settings, updatedCommitments, studyPlans);
             
             // Preserve session status from previous plan
             newPlans.forEach(plan => {
@@ -992,7 +992,7 @@ function App() {
 
         // Use unified redistribution system after task deletion
         try {
-            const result = await generateNewStudyPlan(updatedTasks, settings, fixedCommitments, cleanedPlans);
+            const result = generateNewStudyPlan(updatedTasks, settings, fixedCommitments, cleanedPlans);
             setStudyPlans(result.plans);
             setNotificationMessage('Study plan updated after deleting task.');
             setTimeout(() => setNotificationMessage(null), 3000);
