@@ -564,74 +564,18 @@ function App() {
         }
     };
 
-    // Enhanced redistribution handler with conflict prevention
-    const handleEnhancedRedistribution = async () => {
-        if (tasks.length > 0) {
-            try {
-                // Use the new unified redistribution system
-                const result = await generateNewStudyPlan(tasks, settings, fixedCommitments, studyPlans, {
-                    prioritizeImportantTasks: true,
-                    respectDailyLimits: true,
-                    allowWeekendOverflow: false,
-                    maxRedistributionDays: 14,
-                    preserveSessionSize: true,
-                    enableRollback: true
-                });
 
-                setStudyPlans(result.plans);
-
-                if (result.redistributionResult?.success && result.redistributionResult.redistributedSessions.length > 0) {
-                    setNotificationMessage(
-                        `Enhanced redistribution complete: ${result.redistributionResult.redistributedSessions.length} sessions moved, ${result.redistributionResult.failedSessions.length} failed`
-                    );
-                } else if (result.redistributionResult?.failedSessions.length === 0) {
-                    setNotificationMessage('No missed sessions found to redistribute.');
-                } else {
-                    setNotificationMessage('Some sessions could not be redistributed. Check your schedule for available time slots.');
-                }
-
-                setTimeout(() => setNotificationMessage(''), 5000);
-            } catch (error) {
-                console.error('Enhanced redistribution failed:', error);
-                setNotificationMessage('Enhanced redistribution failed. Please try again.');
-                setTimeout(() => setNotificationMessage(''), 5000);
-            }
-        }
-    };
-
-    // Handle redistribution of missed sessions specifically using unified system
+    // Handle redistribution by regenerating the study plan
     const handleRedistributeMissedSessions = async () => {
         if (tasks.length > 0) {
             try {
-                // Use the unified redistribution system for missed sessions only
-                const result = await generateNewStudyPlan(tasks, settings, fixedCommitments, studyPlans, {
-                    respectDailyLimits: true,
-                    allowWeekendOverflow: false,
-                    maxRedistributionDays: 14,
-                    prioritizeImportantTasks: true,
-                    preserveSessionSize: true,
-                    enableRollback: true
-                });
-
-                if (result.redistributionResult?.success) {
-                    setStudyPlans(result.plans);
-                    setNotificationMessage(result.redistributionResult.feedback);
-
-                    // Log detailed information for debugging
-                    console.log('Unified redistribution details:', result.redistributionResult);
-                } else {
-                    setNotificationMessage(result.redistributionResult?.feedback || 'Redistribution completed with no changes.');
-
-                    // Log any issues
-                    if (result.redistributionResult?.failedSessions.length) {
-                        console.warn('Some sessions could not be redistributed:', result.redistributionResult.failedSessions);
-                    }
-                }
-
+                // Simply regenerate the study plan which will incorporate missed sessions
+                await handleGenerateStudyPlan();
+                setNotificationMessage('Study plan regenerated successfully! Missed sessions have been incorporated into the new plan.');
                 setTimeout(() => setNotificationMessage(''), 5000);
             } catch (error) {
-                console.error('Unified redistribution failed:', error);
-                setNotificationMessage('Redistribution failed. Please try again.');
+                console.error('Study plan regeneration failed:', error);
+                setNotificationMessage('Failed to regenerate study plan. Please try again.');
                 setTimeout(() => setNotificationMessage(''), 5000);
             }
         }
@@ -2015,7 +1959,6 @@ function App() {
                             onAddFixedCommitment={handleAddFixedCommitment}
                             onSkipMissedSession={handleSkipMissedSession}
                 onRedistributeMissedSessions={handleRedistributeMissedSessions}
-                onEnhancedRedistribution={handleEnhancedRedistribution}
                             onUpdateTask={handleUpdateTask}
                         />
                     )}
