@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Calendar, CheckSquare, Clock, Settings as SettingsIcon, BarChart3, CalendarDays, Lightbulb, Edit, Trash2, Menu, X, HelpCircle, Trophy, User } from 'lucide-react';
 import { Task, StudyPlan, UserSettings, FixedCommitment, StudySession, TimerState } from './types';
 import { GamificationData, Achievement, DailyChallenge, MotivationalMessage } from './types-gamification';
-import { getUnscheduledMinutesForTasks, getLocalDateString, redistributeAfterTaskDeletion, checkCommitmentConflicts } from './utils/scheduling';
+import { getUnscheduledMinutesForTasks, getLocalDateString, checkCommitmentConflicts } from './utils/scheduling';
 import { generateStudyPlanWithUnifiedRedistribution as generateNewStudyPlan, validateRedistributionResult, analyzeSessionStates } from './utils/scheduling-integration';
 import { getAccurateUnscheduledTasks, shouldShowNotifications, getNotificationPriority } from './utils/enhanced-notifications';
 import { enhancedEstimationTracker } from './utils/enhanced-estimation-tracker';
