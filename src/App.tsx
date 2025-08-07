@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { Calendar, CheckSquare, Clock, Settings as SettingsIcon, BarChart3, CalendarDays, Lightbulb, Edit, Trash2, Menu, X, HelpCircle, Trophy, User } from 'lucide-react';
 import { Task, StudyPlan, UserSettings, FixedCommitment, StudySession, TimerState } from './types';
 import { GamificationData, Achievement, DailyChallenge, MotivationalMessage } from './types-gamification';
-import { generateNewStudyPlan, getUnscheduledMinutesForTasks, getLocalDateString, redistributeAfterTaskDeletion, redistributeMissedSessionsWithFeedback, checkCommitmentConflicts, redistributeMissedSessionsEnhanced } from './utils/scheduling';
+import { getUnscheduledMinutesForTasks, getLocalDateString, redistributeAfterTaskDeletion, checkCommitmentConflicts } from './utils/scheduling';
+import { generateStudyPlanWithUnifiedRedistribution as generateNewStudyPlan, validateRedistributionResult, analyzeSessionStates } from './utils/scheduling-integration';
 import { getAccurateUnscheduledTasks, shouldShowNotifications, getNotificationPriority } from './utils/enhanced-notifications';
 import { enhancedEstimationTracker } from './utils/enhanced-estimation-tracker';
 import { RedistributionOptions } from './types';
@@ -2483,7 +2484,7 @@ function App() {
                                         </h4>
                                         <div className="grid grid-cols-3 gap-2">
                                             {[
-                                                { amount: '₱50', emoji: '☕', desc: 'Coffee' },
+                                                { amount: '₱50', emoji: '���', desc: 'Coffee' },
                                                 { amount: '₱100', emoji: '���', desc: 'Pizza' },
                                                 { amount: '₱200', emoji: '🎉', desc: 'Party' }
                                             ].map((item, index) => (
