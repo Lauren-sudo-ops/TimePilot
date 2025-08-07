@@ -411,7 +411,10 @@ const StudyPlanView: React.FC<StudyPlanViewProps> = ({ studyPlans, tasks, fixedC
                     <li>• <strong>Redistribute Sessions</strong> reschedules sessions for tasks with future deadlines</li>
                   )}
                   {overdueMissedSessions.length > 0 && (
-                    <li>• <strong>Mark as Done</strong> completes overdue tasks (deadline already passed)</li>
+                    <>
+                      <li>• <strong>Mark Done</strong> marks individual sessions as completed</li>
+                      <li>• <strong>Mark Task Done</strong> completes entire overdue task (deadline already passed)</li>
+                    </>
                   )}
                 </ul>
                 {hasOverdueSessions && (
