@@ -677,7 +677,7 @@ const StudyPlanView: React.FC<StudyPlanViewProps> = ({ studyPlans, tasks, fixedC
                     const pad = (n: number) => n.toString().padStart(2, '0');
                     const reschedStartTime = pad(reschedHour) + ':' + pad(reschedMinute);
                     const reschedEndTime = pad(reschedEndDate.getHours()) + ':' + pad(reschedEndDate.getMinutes());
-                    const reschedDayOfWeek = new Date(reschedDate).getDay();
+                    // const reschedDayOfWeek = new Date(reschedDate).getDay();
                     const newFixedCommitment: FixedCommitment = {
                       id: 'manual-resched-' + Date.now(),
                       title: reschedModal.task.title + ' (Manual Resched)',
@@ -914,7 +914,7 @@ const StudyPlanView: React.FC<StudyPlanViewProps> = ({ studyPlans, tasks, fixedC
           
           {todaysPlan.plannedTasks
             .filter(session => session.status !== 'skipped') // Hide skipped sessions from UI
-            .map((session, index) => {
+            .map((session) => {
             const task = getTaskById(session.taskId);
             if (!task) return null;
             const isDone = session.done;
@@ -1153,7 +1153,7 @@ const StudyPlanView: React.FC<StudyPlanViewProps> = ({ studyPlans, tasks, fixedC
                   <div className="space-y-2">
                     {plan.plannedTasks
                       .filter(session => session.status !== 'skipped') // Hide skipped sessions from upcoming plans
-                      .map((session, index) => {
+                      .map((session) => {
                       const task = getTaskById(session.taskId);
                       if (!task) return null;
                       const sessionStatus = checkSessionStatus(session, plan.date);
