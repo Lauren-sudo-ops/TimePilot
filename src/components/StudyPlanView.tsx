@@ -15,6 +15,7 @@ interface StudyPlanViewProps {
   onSkipMissedSession: (planDate: string, sessionNumber: number, taskId: string) => void;
   onRedistributeMissedSessions?: () => void; // NEW PROP for redistribution
   onUpdateTask?: (taskId: string, updates: Partial<Task>) => void; // NEW PROP for task completion
+  onMarkMissedSessionDone?: (planDate: string, sessionNumber: number, taskId: string) => void; // NEW PROP for marking missed sessions as done
 }
 
 // Force warnings UI to be hidden for all users on first load unless they have a preference
@@ -24,7 +25,7 @@ if (typeof window !== 'undefined') {
   }
 }
 
-const StudyPlanView: React.FC<StudyPlanViewProps> = ({ studyPlans, tasks, fixedCommitments, onSelectTask, onGenerateStudyPlan, onUndoSessionDone, settings, onAddFixedCommitment, onSkipMissedSession, onRedistributeMissedSessions, onUpdateTask }) => {
+const StudyPlanView: React.FC<StudyPlanViewProps> = ({ studyPlans, tasks, fixedCommitments, onSelectTask, onGenerateStudyPlan, onUndoSessionDone, settings, onAddFixedCommitment, onSkipMissedSession, onRedistributeMissedSessions, onUpdateTask, onMarkMissedSessionDone }) => {
   const [notificationMessage, setNotificationMessage] = useState<string | null>(null);
   const [] = useState<{ taskTitle: string; unscheduledMinutes: number } | null>(null);
   const [showRegenerateConfirmation, setShowRegenerateConfirmation] = useState(false);
@@ -285,32 +286,13 @@ const StudyPlanView: React.FC<StudyPlanViewProps> = ({ studyPlans, tasks, fixedC
 
   // Handler for marking individual missed sessions as done
   const handleMarkMissedSessionDone = (planDate: string, sessionNumber: number, taskId: string) => {
-    // Note: setStudyPlans is not available in this component as it receives studyPlans as prop
-    // This functionality should be handled by the parent component
-    setNotificationMessage('Session marking functionality needs to be implemented by parent component');
-    // TODO: Add onMarkSessionDone prop to handle this in parent component
-    /*
-    setStudyPlans((prevPlans: StudyPlan[]) => {
-      return prevPlans.map((plan: StudyPlan) => {
-        if (plan.date !== planDate) return plan;
-
-        return {
-          ...plan,
-          plannedTasks: plan.plannedTasks.map((session: StudySession) => {
-            if (session.taskId === taskId && session.sessionNumber === sessionNumber) {
-              return {
-                ...session,
-                done: true,
-                status: 'completed' as const,
-                completedAt: new Date().toISOString()
-              };
-            }
-            return session;
-          })
-        };
-      });
-    });
-    */
+    if (onMarkMissedSessionDone) {
+      onMarkMissedSessionDone(planDate, sessionNumber, taskId);
+      const task = getTaskById(taskId);
+      setNotificationMessage(`Session for "${task?.title || 'Unknown Task'}" marked as completed`);
+    } else {
+      setNotificationMessage('Session marking functionality not available');
+    }
     setTimeout(() => setNotificationMessage(null), 3000);
   };
 
