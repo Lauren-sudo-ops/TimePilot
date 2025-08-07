@@ -6,7 +6,6 @@ import { getUnscheduledMinutesForTasks, getLocalDateString, checkCommitmentConfl
 import { generateStudyPlanWithUnifiedRedistribution as generateNewStudyPlan, validateRedistributionResult, analyzeSessionStates } from './utils/scheduling-integration';
 import { getAccurateUnscheduledTasks, shouldShowNotifications, getNotificationPriority } from './utils/enhanced-notifications';
 import { enhancedEstimationTracker } from './utils/enhanced-estimation-tracker';
-import { RedistributionOptions } from './types';
 import {
   ACHIEVEMENTS,
   updateUserStats,
@@ -2148,7 +2147,7 @@ function App() {
                                 <div className="space-y-6">
                                     {/* Getting Started Section */}
                                     <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-700">
-                                        <h3 className="text-lg font-semibold text-blue-800 dark:text-blue-200 mb-2">🚀 Getting Started</h3>
+                                        <h3 className="text-lg font-semibold text-blue-800 dark:text-blue-200 mb-2">��� Getting Started</h3>
                                         <ol className="text-sm text-blue-700 dark:text-blue-300 space-y-1">
                                             <li>1. Add your tasks with deadlines and time estimates</li>
                                             <li>2. Set your fixed commitments (classes, work, etc.)</li>
@@ -2228,7 +2227,7 @@ function App() {
                                                     <div>
                                                         <strong className="text-red-600 dark:text-red-400">Missed Sessions:</strong>
                                                         <ul className="ml-4 mt-1 space-y-1">
-                                                            <li>��� Automatically marked as "missed" when the scheduled time passes</li>
+                                                            <li>• Automatically marked as "missed" when the scheduled time passes</li>
                                                             <li>• Hours are automatically redistributed to future available time slots</li>
                                                             <li>• TimePilot tries to maintain deadline compliance when redistributing</li>
                                                             <li>• You can manually mark a session as completed if you studied at a different time</li>
