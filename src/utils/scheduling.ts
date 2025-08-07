@@ -2113,24 +2113,6 @@ export const findNextAvailableStartTime = (
   return studyWindowStart;
 };
 
-/**
- * Enhanced redistribution function using the new conflict-free system
- */
-export const redistributeMissedSessionsEnhanced = (
-  studyPlans: StudyPlan[],
-  settings: UserSettings,
-  fixedCommitments: FixedCommitment[],
-  tasks: Task[],
-  options: RedistributionOptions = {
-    prioritizeMissedSessions: true,
-    respectDailyLimits: true,
-    allowWeekendOverflow: false,
-    maxRedistributionDays: 14
-  }
-): RedistributionResult => {
-  const engine = createEnhancedRedistributionEngine(settings, fixedCommitments);
-  return engine.redistributeMissedSessions(studyPlans, tasks, options);
-};
 
 /**
  * Enhanced skip session function with partial skip support
