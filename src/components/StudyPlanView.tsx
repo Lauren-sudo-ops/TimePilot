@@ -200,7 +200,16 @@ const StudyPlanView: React.FC<StudyPlanViewProps> = ({ studyPlans, tasks, fixedC
       // and not redistributed there
       const isRedistributedToPast = session.originalTime && session.originalDate && plan.date < today;
 
-      if (sessionStatus === 'missed' && !isRedistributedToPast) {
+      // Skip sessions that have been successfully redistributed
+      const isRedistributed = session.status === 'redistributed' ||
+                             session.state === 'redistributed' ||
+                             (session.schedulingMetadata?.rescheduleHistory &&
+                              session.schedulingMetadata.rescheduleHistory.some(h => h.success && h.reason === 'redistribution'));
+
+      // Skip sessions that are already marked as completed or done
+      const isCompleted = session.done || session.status === 'completed' || session.status === 'skipped';
+
+      if (sessionStatus === 'missed' && !isRedistributedToPast && !isRedistributed && !isCompleted) {
         const task = getTaskById(session.taskId);
         if (task) {
           console.log(`Found missed session: ${task.title} on ${plan.date}, status: ${sessionStatus}, sessionNumber: ${session.sessionNumber}`);
@@ -323,6 +332,34 @@ const StudyPlanView: React.FC<StudyPlanViewProps> = ({ studyPlans, tasks, fixedC
     }
   };
 
+  // Handler for marking individual missed sessions as done
+  const handleMarkMissedSessionDone = (planDate: string, sessionNumber: number, taskId: string) => {
+    // First mark the session as done in the study plans
+    setStudyPlans(prevPlans => {
+      return prevPlans.map(plan => {
+        if (plan.date !== planDate) return plan;
+
+        return {
+          ...plan,
+          plannedTasks: plan.plannedTasks.map(session => {
+            if (session.taskId === taskId && session.sessionNumber === sessionNumber) {
+              return {
+                ...session,
+                done: true,
+                status: 'completed' as const,
+                completedAt: new Date().toISOString()
+              };
+            }
+            return session;
+          })
+        };
+      });
+    });
+
+    setNotificationMessage('Session marked as completed');
+    setTimeout(() => setNotificationMessage(null), 3000);
+  };
+
   return (
     <div className="space-y-6 relative study-plan-container">
       {/* Missed Sessions Section */}
@@ -368,12 +405,16 @@ const StudyPlanView: React.FC<StudyPlanViewProps> = ({ studyPlans, tasks, fixedC
                 <p>You have missed study sessions. Available actions:</p>
                 <ul className="mt-2 space-y-1">
                   <li>• <strong>Skip</strong> any missed session (marks as completed, won't be redistributed)</li>
+                  <li>• <strong>Mark Done</strong> marks individual sessions as completed</li>
                   <li>• <strong>Start studying</strong> any missed session now</li>
                   {missedSessions.length > 0 && (
                     <li>• <strong>Redistribute Sessions</strong> reschedules sessions for tasks with future deadlines</li>
                   )}
                   {overdueMissedSessions.length > 0 && (
-                    <li>• <strong>Mark as Done</strong> completes overdue tasks (deadline already passed)</li>
+                    <>
+                      <li>• <strong>Mark Done</strong> marks individual sessions as completed</li>
+                      <li>• <strong>Mark Task Done</strong> completes entire overdue task (deadline already passed)</li>
+                    </>
                   )}
                 </ul>
                 {hasOverdueSessions && (
@@ -475,6 +516,13 @@ const StudyPlanView: React.FC<StudyPlanViewProps> = ({ studyPlans, tasks, fixedC
                       >
                         Skip
                       </button>
+                      <button
+                        onClick={() => handleMarkMissedSessionDone(planDate, session.sessionNumber || 0, task.id)}
+                        className="px-3 py-1 text-xs bg-purple-100 text-purple-800 rounded-lg hover:bg-purple-200 transition-colors duration-200 dark:bg-purple-900 dark:text-purple-200 dark:hover:bg-purple-800"
+                        title="Mark this session as completed"
+                      >
+                        Mark Done
+                      </button>
                     </div>
                   </div>
                 ))}
@@ -536,13 +584,20 @@ const StudyPlanView: React.FC<StudyPlanViewProps> = ({ studyPlans, tasks, fixedC
                       >
                         Skip
                       </button>
+                      <button
+                        onClick={() => handleMarkMissedSessionDone(planDate, session.sessionNumber || 0, task.id)}
+                        className="px-3 py-1 text-xs bg-purple-100 text-purple-800 rounded-lg hover:bg-purple-200 transition-colors duration-200 dark:bg-purple-900 dark:text-purple-200 dark:hover:bg-purple-800"
+                        title="Mark this session as completed"
+                      >
+                        Mark Done
+                      </button>
                       {onUpdateTask && (
                         <button
                           onClick={() => handleMarkTaskAsCompleted(task.id)}
-                          className="px-3 py-1 text-xs bg-purple-100 text-purple-800 rounded-lg hover:bg-purple-200 transition-colors duration-200 dark:bg-purple-900 dark:text-purple-200 dark:hover:bg-purple-800"
+                          className="px-3 py-1 text-xs bg-blue-100 text-blue-800 rounded-lg hover:bg-blue-200 transition-colors duration-200 dark:bg-blue-900 dark:text-blue-200 dark:hover:bg-blue-800"
                           title="Mark the entire task as completed"
                         >
-                          Mark as Done
+                          Mark Task Done
                         </button>
                       )}
                     </div>
