@@ -200,7 +200,16 @@ const StudyPlanView: React.FC<StudyPlanViewProps> = ({ studyPlans, tasks, fixedC
       // and not redistributed there
       const isRedistributedToPast = session.originalTime && session.originalDate && plan.date < today;
 
-      if (sessionStatus === 'missed' && !isRedistributedToPast) {
+      // Skip sessions that have been successfully redistributed
+      const isRedistributed = session.status === 'redistributed' ||
+                             session.state === 'redistributed' ||
+                             (session.schedulingMetadata?.rescheduleHistory &&
+                              session.schedulingMetadata.rescheduleHistory.some(h => h.success && h.reason === 'redistribution'));
+
+      // Skip sessions that are already marked as completed or done
+      const isCompleted = session.done || session.status === 'completed' || session.status === 'skipped';
+
+      if (sessionStatus === 'missed' && !isRedistributedToPast && !isRedistributed && !isCompleted) {
         const task = getTaskById(session.taskId);
         if (task) {
           console.log(`Found missed session: ${task.title} on ${plan.date}, status: ${sessionStatus}, sessionNumber: ${session.sessionNumber}`);
