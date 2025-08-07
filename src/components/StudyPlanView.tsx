@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, BookOpen, TrendingUp, AlertTriangle, CheckCircle, Lightbulb, X, CheckCircle2, Clock3 } from 'lucide-react';
 import { StudyPlan, Task, StudySession, FixedCommitment, UserSettings } from '../types'; // Added FixedCommitment to imports
-import { formatTime, generateSmartSuggestions, getLocalDateString, checkSessionStatus, getDailyAvailableTimeSlots, findNextAvailableStartTime, moveIndividualSession, redistributeMissedSessionsEnhanced, skipSessionEnhanced, validateTimeSlot, isTaskDeadlinePast } from '../utils/scheduling';
+import { formatTime, generateSmartSuggestions, getLocalDateString, checkSessionStatus, moveIndividualSession, redistributeMissedSessionsEnhanced, isTaskDeadlinePast } from '../utils/scheduling';
 import { RedistributionOptions } from '../types';
 
 interface StudyPlanViewProps {
@@ -202,7 +202,7 @@ const StudyPlanView: React.FC<StudyPlanViewProps> = ({ studyPlans, tasks, fixedC
 
       // Skip sessions that have been successfully redistributed
       const isRedistributed = session.status === 'redistributed' ||
-                             session.state === 'redistributed' ||
+                             session.schedulingMetadata?.state === 'redistributed' ||
                              (session.schedulingMetadata?.rescheduleHistory &&
                               session.schedulingMetadata.rescheduleHistory.some(h => h.success && h.reason === 'redistribution'));
 
@@ -334,14 +334,18 @@ const StudyPlanView: React.FC<StudyPlanViewProps> = ({ studyPlans, tasks, fixedC
 
   // Handler for marking individual missed sessions as done
   const handleMarkMissedSessionDone = (planDate: string, sessionNumber: number, taskId: string) => {
-    // First mark the session as done in the study plans
-    setStudyPlans(prevPlans => {
-      return prevPlans.map(plan => {
+    // Note: setStudyPlans is not available in this component as it receives studyPlans as prop
+    // This functionality should be handled by the parent component
+    setNotificationMessage('Session marking functionality needs to be implemented by parent component');
+    // TODO: Add onMarkSessionDone prop to handle this in parent component
+    /*
+    setStudyPlans((prevPlans: StudyPlan[]) => {
+      return prevPlans.map((plan: StudyPlan) => {
         if (plan.date !== planDate) return plan;
 
         return {
           ...plan,
-          plannedTasks: plan.plannedTasks.map(session => {
+          plannedTasks: plan.plannedTasks.map((session: StudySession) => {
             if (session.taskId === taskId && session.sessionNumber === sessionNumber) {
               return {
                 ...session,
@@ -355,8 +359,7 @@ const StudyPlanView: React.FC<StudyPlanViewProps> = ({ studyPlans, tasks, fixedC
         };
       });
     });
-
-    setNotificationMessage('Session marked as completed');
+    */
     setTimeout(() => setNotificationMessage(null), 3000);
   };
 
