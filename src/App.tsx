@@ -1957,6 +1957,7 @@ function App() {
                             onSkipMissedSession={handleSkipMissedSession}
                 onRedistributeMissedSessions={handleRedistributeMissedSessions}
                             onUpdateTask={handleUpdateTask}
+                            onMarkMissedSessionDone={handleMarkMissedSessionDone}
                         />
                     )}
 
