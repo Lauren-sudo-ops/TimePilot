@@ -790,7 +790,7 @@ function App() {
         }
     };
 
-    const handleDeleteFixedCommitment = (commitmentId: string) => {
+    const handleDeleteFixedCommitment = async (commitmentId: string) => {
         // Find the commitment being deleted
         const commitmentToDelete = fixedCommitments.find(c => c.id === commitmentId);
 
