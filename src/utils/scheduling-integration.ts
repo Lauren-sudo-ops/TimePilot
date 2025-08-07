@@ -1,13 +1,14 @@
-import { 
-  Task, 
-  StudyPlan, 
-  StudySession, 
-  UserSettings, 
-  FixedCommitment 
+import {
+  Task,
+  StudyPlan,
+  StudySession,
+  UserSettings,
+  FixedCommitment
 } from '../types';
 import { generateNewStudyPlan as originalGenerateStudyPlan } from './scheduling';
 import { createUnifiedRedistributionEngine, UnifiedRedistributionOptions } from './unified-redistribution';
 import { createConflictPreventionEngine } from './conflict-prevention';
+import { createTaskAwareRedistributionEngine } from './task-aware-redistribution';
 
 /**
  * Enhanced study plan generation with unified redistribution system
