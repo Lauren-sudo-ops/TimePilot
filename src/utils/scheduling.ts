@@ -2403,7 +2403,7 @@ export const moveMissedSessions = (
       const newSession = {...session};
       newSession.originalTime = session.startTime;
       newSession.originalDate = planDate;
-      newSession.status = 'scheduled';
+      newSession.status = 'redistributed';  // Mark as redistributed to prevent it from appearing in missed sessions
       newSession.startTime = moveResult.targetTime;
       
       // Calculate end time
