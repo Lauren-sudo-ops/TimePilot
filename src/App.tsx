@@ -575,7 +575,7 @@ function App() {
       setAutoRemovedTasks(prev => prev.filter(title => title !== taskTitle));
     };
 
-    const handleAddTask = async (taskData: Omit<Task, 'id' | 'createdAt'>) => {
+    const handleAddTask = (taskData: Omit<Task, 'id' | 'createdAt'>) => {
         const newTask: Task = {
             ...taskData,
             id: Date.now().toString(),
@@ -583,9 +583,7 @@ function App() {
         };
         let updatedTasks = [...tasks, newTask];
         // Generate a study plan with the new task
-        let { plans } = await generateNewStudyPlan(updatedTasks, settings, fixedCommitments, studyPlans);
-        // Check if the new task can actually be scheduled by examining the study plan
-        const { plans: newPlans } = await generateNewStudyPlan(updatedTasks, settings, fixedCommitments, studyPlans);
+        const { plans: newPlans } = generateNewStudyPlan(updatedTasks, settings, fixedCommitments, studyPlans);
         
         // Check if the new task has any unscheduled time (excluding skipped sessions)
         const newTaskScheduledHours: Record<string, number> = {};
