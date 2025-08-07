@@ -2429,7 +2429,13 @@ export const moveMissedSessions = (
       const endHour = Math.floor(endTimeInMinutes / 60);
       const endMinute = endTimeInMinutes % 60;
       newSession.endTime = `${endHour.toString().padStart(2, '0')}:${endMinute.toString().padStart(2, '0')}`;
-      
+
+      // Complete the redistribution metadata with the calculated end time
+      if (newSession.schedulingMetadata?.rescheduleHistory && newSession.schedulingMetadata.rescheduleHistory.length > 0) {
+        const lastReschedule = newSession.schedulingMetadata.rescheduleHistory[newSession.schedulingMetadata.rescheduleHistory.length - 1];
+        lastReschedule.to.endTime = newSession.endTime;
+      }
+
       console.log(`Moving session to: ${moveResult.targetDate} at ${moveResult.targetTime}, original date: ${planDate}`);
       
       // Find or create target plan
