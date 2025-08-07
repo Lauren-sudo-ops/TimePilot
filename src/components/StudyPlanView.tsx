@@ -580,13 +580,20 @@ const StudyPlanView: React.FC<StudyPlanViewProps> = ({ studyPlans, tasks, fixedC
                       >
                         Skip
                       </button>
+                      <button
+                        onClick={() => handleMarkMissedSessionDone(planDate, session.sessionNumber || 0, task.id)}
+                        className="px-3 py-1 text-xs bg-purple-100 text-purple-800 rounded-lg hover:bg-purple-200 transition-colors duration-200 dark:bg-purple-900 dark:text-purple-200 dark:hover:bg-purple-800"
+                        title="Mark this session as completed"
+                      >
+                        Mark Done
+                      </button>
                       {onUpdateTask && (
                         <button
                           onClick={() => handleMarkTaskAsCompleted(task.id)}
-                          className="px-3 py-1 text-xs bg-purple-100 text-purple-800 rounded-lg hover:bg-purple-200 transition-colors duration-200 dark:bg-purple-900 dark:text-purple-200 dark:hover:bg-purple-800"
+                          className="px-3 py-1 text-xs bg-blue-100 text-blue-800 rounded-lg hover:bg-blue-200 transition-colors duration-200 dark:bg-blue-900 dark:text-blue-200 dark:hover:bg-blue-800"
                           title="Mark the entire task as completed"
                         >
-                          Mark as Done
+                          Mark Task Done
                         </button>
                       )}
                     </div>
