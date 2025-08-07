@@ -448,11 +448,11 @@ function App() {
     }, [tasks, settings, fixedCommitments, hasLoadedFromStorage]);
 
     // Manual study plan generation handler
-    const handleGenerateStudyPlan = () => {
+    const handleGenerateStudyPlan = async () => {
         if (tasks.length > 0) {
             // Check if there are manually rescheduled sessions that will be affected
-            const hasManualReschedules = studyPlans.some(plan => 
-                plan.plannedTasks.some(session => 
+            const hasManualReschedules = studyPlans.some(plan =>
+                plan.plannedTasks.some(session =>
                     session.originalTime && session.originalDate && session.isManualOverride
                 )
             );
@@ -461,10 +461,10 @@ function App() {
                 const shouldPreserveReschedules = window.confirm(
                     "You have manually rescheduled sessions. Regenerating the study plan will move them back to their original times. Would you like to preserve your manual reschedules?"
                 );
-                
+
                 if (shouldPreserveReschedules) {
                     // Generate plan but preserve manual reschedules
-                    const result = generateNewStudyPlan(tasks, settings, fixedCommitments, studyPlans);
+                    const result = await generateNewStudyPlan(tasks, settings, fixedCommitments, studyPlans);
                     const newPlans = result.plans;
                     
                     // Enhanced preservation logic
@@ -2261,7 +2261,7 @@ function App() {
                                                         <strong className="text-purple-600 dark:text-purple-400">Session Settings:</strong>
                                                         <ul className="ml-4 mt-1 space-y-1">
                                                             <li>• <strong>Minimum Session Length:</strong> Shortest study session (prevents tiny sessions)</li>
-                                                            <li>• <strong>Buffer Time:</strong> Rest time between back-to-back sessions</li>
+                                                            <li>��� <strong>Buffer Time:</strong> Rest time between back-to-back sessions</li>
                                                         </ul>
                                                     </div>
                                                     <div>
