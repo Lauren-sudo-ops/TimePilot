@@ -694,7 +694,7 @@ function App() {
         setLastPlanStaleReason("task");
     };
 
-    const handleAddFixedCommitment = (commitmentData: Omit<FixedCommitment, 'id' | 'createdAt'>) => {
+    const handleAddFixedCommitment = async (commitmentData: Omit<FixedCommitment, 'id' | 'createdAt'>) => {
         const newCommitment: FixedCommitment = {
             ...commitmentData,
             id: Date.now().toString(),
