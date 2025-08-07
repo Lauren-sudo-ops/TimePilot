@@ -556,11 +556,11 @@ function App() {
 
 
     // Handle redistribution by regenerating the study plan
-    const handleRedistributeMissedSessions = async () => {
+    const handleRedistributeMissedSessions = () => {
         if (tasks.length > 0) {
             try {
                 // Simply regenerate the study plan which will incorporate missed sessions
-                await handleGenerateStudyPlan();
+                handleGenerateStudyPlan();
                 setNotificationMessage('Study plan regenerated successfully! Missed sessions have been incorporated into the new plan.');
                 setTimeout(() => setNotificationMessage(''), 5000);
             } catch (error) {
