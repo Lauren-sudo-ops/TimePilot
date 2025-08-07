@@ -682,7 +682,7 @@ function App() {
               `• Adjust your study window hours in Settings\n`
             );
             setTasks(tasks);
-            const { plans: restoredPlans } = generateNewStudyPlan(tasks, settings, fixedCommitments, studyPlans);
+            const { plans: restoredPlans } = await generateNewStudyPlan(tasks, settings, fixedCommitments, studyPlans);
             setStudyPlans(restoredPlans);
             setShowTaskInput(false);
             setLastPlanStaleReason("task");
