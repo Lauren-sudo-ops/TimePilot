@@ -2405,6 +2405,22 @@ export const moveMissedSessions = (
       newSession.originalDate = planDate;
       newSession.status = 'redistributed';  // Mark as redistributed to prevent it from appearing in missed sessions
       newSession.startTime = moveResult.targetTime;
+      newSession.rescheduledAt = new Date().toISOString();
+
+      // Add redistribution metadata to help with tracking
+      if (!newSession.schedulingMetadata) {
+        newSession.schedulingMetadata = { rescheduleHistory: [] };
+      }
+      if (!newSession.schedulingMetadata.rescheduleHistory) {
+        newSession.schedulingMetadata.rescheduleHistory = [];
+      }
+      newSession.schedulingMetadata.rescheduleHistory.push({
+        from: { date: planDate, startTime: session.startTime || '', endTime: session.endTime || '' },
+        to: { date: moveResult.targetDate, startTime: moveResult.targetTime, endTime: '' }, // endTime will be filled below
+        timestamp: new Date().toISOString(),
+        reason: 'redistribution',
+        success: true
+      });
       
       // Calculate end time
       const [startHour, startMinute] = (moveResult.targetTime || '00:00').split(':').map(Number);
