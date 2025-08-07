@@ -315,6 +315,14 @@ const StudyPlanView: React.FC<StudyPlanViewProps> = ({ studyPlans, tasks, fixedC
 
   const activeTasks = tasks.filter(task => task.status === 'pending' && task.estimatedHours > 0);
 
+  // Handler for marking overdue tasks as completed
+  const handleMarkTaskAsCompleted = (taskId: string) => {
+    if (onUpdateTask) {
+      onUpdateTask(taskId, { status: 'completed' });
+      setNotificationMessage('Task marked as completed');
+    }
+  };
+
   return (
     <div className="space-y-6 relative study-plan-container">
       {/* Missed Sessions Section */}
