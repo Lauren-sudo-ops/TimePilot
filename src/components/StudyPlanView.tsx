@@ -317,26 +317,29 @@ const StudyPlanView: React.FC<StudyPlanViewProps> = ({ studyPlans, tasks, fixedC
   return (
     <div className="space-y-6 relative study-plan-container">
       {/* Missed Sessions Section */}
-      {missedSessions.length > 0 && (
-        <div className={`bg-white rounded-xl shadow-lg p-6 mb-6 dark:bg-gray-900 dark:shadow-gray-900 border-l-4 ${missedSessions.length > 0 ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'}`}>
+      {(missedSessions.length > 0 || overdueMissedSessions.length > 0) && (
+        <div className={`bg-white rounded-xl shadow-lg p-6 mb-6 dark:bg-gray-900 dark:shadow-gray-900 border-l-4 ${(missedSessions.length > 0 || overdueMissedSessions.length > 0) ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'}`}>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-2">
-              <AlertTriangle className={`${missedSessions.length > 0 ? 'text-red-500 dark:text-red-400' : 'text-gray-400 dark:text-gray-500'}`} size={24} />
+              <AlertTriangle className={`${(missedSessions.length > 0 || overdueMissedSessions.length > 0) ? 'text-red-500 dark:text-red-400' : 'text-gray-400 dark:text-gray-500'}`} size={24} />
               <h2 className="text-xl font-semibold text-gray-800 dark:text-white">Missed Sessions</h2>
-              <span className={`px-2 py-1 text-xs rounded-full ${
-                missedSessions.length > 0 
-                  ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' 
-                  : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
-              }`}>
-                {missedSessions.length} missed
-              </span>
+              {missedSessions.length > 0 && (
+                <span className="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">
+                  {missedSessions.length} can redistribute
+                </span>
+              )}
+              {overdueMissedSessions.length > 0 && (
+                <span className="px-2 py-1 text-xs rounded-full bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300">
+                  {overdueMissedSessions.length} overdue
+                </span>
+              )}
             </div>
             <div className="flex space-x-2">
               <button
                 onClick={handleEnhancedRedistribution}
-                disabled={redistributionInProgress}
+                disabled={redistributionInProgress || !canRedistribute}
                 className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-sm rounded-lg hover:from-blue-600 hover:to-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                title="Intelligently redistribute missed sessions with conflict prevention"
+                title={canRedistribute ? "Intelligently redistribute missed sessions with conflict prevention" : "Redistribution disabled - no sessions with future deadlines to redistribute"}
               >
                 {redistributionInProgress ? (
                   <div className="flex items-center space-x-2">
