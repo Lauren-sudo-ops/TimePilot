@@ -1274,6 +1274,39 @@ function App() {
         return false; // Task was not handled
     };
 
+    // Handler to mark a missed session as done
+    const handleMarkMissedSessionDone = (planDate: string, sessionNumber: number, taskId: string) => {
+        setStudyPlans(prevPlans => {
+            return prevPlans.map(plan => {
+                if (plan.date !== planDate) return plan;
+
+                return {
+                    ...plan,
+                    plannedTasks: plan.plannedTasks.map(session => {
+                        if (session.taskId === taskId && session.sessionNumber === sessionNumber) {
+                            return {
+                                ...session,
+                                done: true,
+                                status: 'completed' as const,
+                                actualHours: session.allocatedHours, // Assume full session time was completed
+                                completedAt: new Date().toISOString()
+                            };
+                        }
+                        return session;
+                    })
+                };
+            });
+        });
+
+        // Check if this completes the task (but don't regenerate study plan)
+        setTimeout(() => {
+            const wasHandled = checkAndHandleSkippedOnlyTask(taskId);
+            if (!wasHandled) {
+                checkAndCompleteTask(taskId);
+            }
+        }, 0);
+    };
+
     // Handler to mark a session as done in studyPlans
     const handleMarkSessionDone = (planDate: string, sessionNumber: number) => {
         setStudyPlans(prevPlans => {
