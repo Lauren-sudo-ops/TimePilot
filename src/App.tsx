@@ -1044,26 +1044,33 @@ function App() {
         setLastPlanStaleReason("task");
     };
 
-    const handleDeleteTask = (taskId: string) => {
+    const handleDeleteTask = async (taskId: string) => {
         const updatedTasks = tasks.filter(task => task.id !== taskId);
         setTasks(updatedTasks);
-        
+
         // Clean up study plans by removing all sessions for the deleted task
         const cleanedPlans = studyPlans.map(plan => ({
             ...plan,
             plannedTasks: plan.plannedTasks.filter(session => session.taskId !== taskId)
         })).filter(plan => plan.plannedTasks.length > 0); // Remove empty plans
-        
+
         if (currentTask?.id === taskId) {
             setCurrentTask(null);
         }
         setLastPlanStaleReason("task");
 
-        // Use aggressive redistribution after task deletion with the cleaned plans
-        const newPlans = redistributeAfterTaskDeletion(updatedTasks, settings, fixedCommitments, cleanedPlans);
-        setStudyPlans(newPlans);
-        setNotificationMessage('Study plan redistributed aggressively after deleting task.');
-        setTimeout(() => setNotificationMessage(null), 3000);
+        // Use unified redistribution system after task deletion
+        try {
+            const result = await generateNewStudyPlan(updatedTasks, settings, fixedCommitments, cleanedPlans);
+            setStudyPlans(result.plans);
+            setNotificationMessage('Study plan updated after deleting task.');
+            setTimeout(() => setNotificationMessage(null), 3000);
+        } catch (error) {
+            console.error('Error updating study plan after task deletion:', error);
+            setStudyPlans(cleanedPlans); // Fallback to cleaned plans
+            setNotificationMessage('Task deleted. Study plan may need manual adjustment.');
+            setTimeout(() => setNotificationMessage(null), 3000);
+        }
     };
 
     // Update handleSelectTask to also store planDate and sessionNumber if available
@@ -2221,7 +2228,7 @@ function App() {
                                                     <div>
                                                         <strong className="text-red-600 dark:text-red-400">Missed Sessions:</strong>
                                                         <ul className="ml-4 mt-1 space-y-1">
-                                                            <li>• Automatically marked as "missed" when the scheduled time passes</li>
+                                                            <li>��� Automatically marked as "missed" when the scheduled time passes</li>
                                                             <li>• Hours are automatically redistributed to future available time slots</li>
                                                             <li>• TimePilot tries to maintain deadline compliance when redistributing</li>
                                                             <li>• You can manually mark a session as completed if you studied at a different time</li>
