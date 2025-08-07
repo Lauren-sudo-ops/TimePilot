@@ -1,5 +1,4 @@
 import { Task, StudyPlan, StudySession, UserSettings, FixedCommitment, UserReschedule, RedistributionOptions, RedistributionResult, DateSpecificStudyWindow } from '../types';
-import { createEnhancedRedistributionEngine, createConflictChecker } from './enhanced-scheduling';
 
 // Utility functions
 export const getLocalDateString = (): string => {
