@@ -93,7 +93,7 @@ const TaskInputSimplified: React.FC<TaskInputProps> = ({ onAddTask, onCancel, us
 
   const isDeadlineRequiredForOneSitting = formData.isOneTimeTask && (!formData.deadline || formData.deadline.trim() === '');
   const estimatedDecimalHours = convertToDecimalHours(formData.estimatedHours, formData.estimatedMinutes);
-  const isOneSittingTooLong = formData.isOneTimeTask && estimatedDecimalHours > settings.dailyAvailableHours;
+  const isOneSittingTooLong = formData.isOneTimeTask && estimatedDecimalHours > userSettings.dailyAvailableHours;
   const isFormValid = isTitleValid && isTitleLengthValid && isDeadlineValid &&
                    isEstimatedValid && isEstimatedReasonable && isImpactValid &&
                    isCustomCategoryValid && !isDeadlineRequiredForOneSitting;
@@ -114,7 +114,7 @@ const TaskInputSimplified: React.FC<TaskInputProps> = ({ onAddTask, onCancel, us
   const getValidationWarnings = (): string[] => {
     const warnings: string[] = [];
     if (isOneSittingTooLong) {
-      warnings.push(`⚠️ This one-sitting task (${estimatedDecimalHours}h) exceeds your daily available hours (${settings.dailyAvailableHours}h). Consider reducing the estimated time, increasing your daily hours in settings, or unchecking "one-sitting" to allow splitting.`);
+      warnings.push(`⚠️ This one-sitting task (${estimatedDecimalHours}h) exceeds your daily available hours (${userSettings.dailyAvailableHours}h). Consider reducing the estimated time, increasing your daily hours in settings, or unchecking "one-sitting" to allow splitting.`);
     }
     return warnings;
   };
