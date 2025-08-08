@@ -92,8 +92,10 @@ const TaskInputSimplified: React.FC<TaskInputProps> = ({ onAddTask, onCancel, us
   const isCustomCategoryValid = !showCustomCategory || (formData.customCategory && formData.customCategory.trim().length > 0 && formData.customCategory.trim().length <= 50);
 
   const isDeadlineRequiredForOneSitting = formData.isOneTimeTask && (!formData.deadline || formData.deadline.trim() === '');
-  const isFormValid = isTitleValid && isTitleLengthValid && isDeadlineValid && 
-                   isEstimatedValid && isEstimatedReasonable && isImpactValid && 
+  const estimatedDecimalHours = convertToDecimalHours(formData.estimatedHours, formData.estimatedMinutes);
+  const isOneSittingTooLong = formData.isOneTimeTask && estimatedDecimalHours > settings.dailyAvailableHours;
+  const isFormValid = isTitleValid && isTitleLengthValid && isDeadlineValid &&
+                   isEstimatedValid && isEstimatedReasonable && isImpactValid &&
                    isCustomCategoryValid && !isDeadlineRequiredForOneSitting;
 
   const getValidationErrors = (): string[] => {
@@ -107,6 +109,14 @@ const TaskInputSimplified: React.FC<TaskInputProps> = ({ onAddTask, onCancel, us
     if (!isCustomCategoryValid) errors.push('Custom category must be between 1-50 characters');
     if (isDeadlineRequiredForOneSitting) errors.push('One-sitting tasks require a deadline to be scheduled properly');
     return errors;
+  };
+
+  const getValidationWarnings = (): string[] => {
+    const warnings: string[] = [];
+    if (isOneSittingTooLong) {
+      warnings.push(`⚠️ This one-sitting task (${estimatedDecimalHours}h) exceeds your daily available hours (${settings.dailyAvailableHours}h). Consider reducing the estimated time, increasing your daily hours in settings, or unchecking "one-sitting" to allow splitting.`);
+    }
+    return warnings;
   };
 
   const handleSubmit = (e: React.FormEvent) => {
