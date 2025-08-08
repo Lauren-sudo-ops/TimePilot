@@ -852,6 +852,18 @@ const TaskInput: React.FC<TaskInputProps> = ({ onAddTask, onCancel, userSettings
             </span>
           </div>
         )}
+
+        {/* One-sitting task warnings */}
+        {getValidationWarnings().length > 0 && (
+          <div className="text-yellow-600 bg-yellow-50 border-l-4 border-yellow-400 p-3 rounded mt-2 flex items-start gap-2 dark:bg-yellow-900/20 dark:text-yellow-200 dark:border-yellow-600">
+            <Info className="mt-0.5" size={18} />
+            <div>
+              {getValidationWarnings().map((warning, index) => (
+                <div key={index}>{warning}</div>
+              ))}
+            </div>
+          </div>
+        )}
         {/* Buttons */}
         <div className="flex space-x-3 mt-4 justify-end">
             <button
