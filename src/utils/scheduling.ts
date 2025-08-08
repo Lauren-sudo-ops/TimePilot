@@ -1764,8 +1764,14 @@ export const generateNewStudyPlan = (
       // For one-time tasks, schedule all remaining hours at once if possible
       let hoursToSchedule;
       if (task.isOneTimeTask && taskScheduledHours[task.id] === 0) {
-        // One-time task: try to schedule all hours at once
-        hoursToSchedule = remainingTaskHours <= availableHours ? remainingTaskHours : 0;
+        // One-time task: try to schedule all hours at once, but if not possible on this day,
+        // skip to try other days instead of failing completely
+        if (remainingTaskHours <= availableHours) {
+          hoursToSchedule = remainingTaskHours;
+        } else {
+          // Continue to next day to find one that can accommodate the full session
+          continue;
+        }
       } else {
         // Regular task: can be split across sessions
         hoursToSchedule = Math.min(remainingTaskHours, availableHours);
