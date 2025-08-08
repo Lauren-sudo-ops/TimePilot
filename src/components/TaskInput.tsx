@@ -242,7 +242,8 @@ const TaskInput: React.FC<TaskInputProps> = ({ onAddTask, onCancel, userSettings
   const isImpactValid = formData.impact !== '';
   const isCustomCategoryValid = !showCustomCategory || (formData.customCategory && formData.customCategory.trim().length > 0 && formData.customCategory.trim().length <= 50);
 
-  const isFormValid = isTitleValid && isTitleLengthValid && isDeadlineValid && isDeadlineNotPast && 
+  const isOneSittingTooLong = formData.isOneTimeTask && totalTime > userSettings.dailyAvailableHours;
+  const isFormValid = isTitleValid && isTitleLengthValid && isDeadlineValid && isDeadlineNotPast &&
                      isEstimatedValid && isEstimatedReasonable && isImpactValid && isCustomCategoryValid;
 
   // Enhanced validation messages
@@ -274,6 +275,14 @@ const TaskInput: React.FC<TaskInputProps> = ({ onAddTask, onCancel, userSettings
     }
     
     return errors;
+  };
+
+  const getValidationWarnings = () => {
+    const warnings = [];
+    if (isOneSittingTooLong) {
+      warnings.push(`⚠️ This one-sitting task (${totalTime}h) exceeds your daily available hours (${userSettings.dailyAvailableHours}h). Consider reducing the estimated time, increasing your daily hours in settings, or unchecking "one-sitting" to allow splitting.`);
+    }
+    return warnings;
   };
 
   // --- Add warning for low-priority urgent tasks ---
