@@ -541,6 +541,21 @@ const TaskInputSimplified: React.FC<TaskInputProps> = ({ onAddTask, onCancel, us
             </div>
           )}
 
+          {/* Validation Warnings */}
+          {getValidationWarnings().length > 0 && (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mt-2 dark:bg-yellow-900/20 dark:border-yellow-700">
+              <div className="text-yellow-800 dark:text-yellow-200 font-medium mb-2">⚠️ Warnings:</div>
+              <ul className="text-yellow-700 dark:text-yellow-300 text-sm space-y-1">
+                {getValidationWarnings().map((warning, index) => (
+                  <li key={index} className="flex items-start gap-2">
+                    <span className="text-yellow-500 mt-0.5">•</span>
+                    <span>{warning}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           {/* Form Actions */}
           <div className="flex flex-col sm:flex-row gap-3 pt-4">
             <button
